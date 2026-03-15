@@ -6,11 +6,6 @@ This project demonstrates real-world web development concepts including user aut
 
 The system is built using modern web technologies with a structured frontend and backend architecture, making it scalable and easy to maintain. The goal of this project is to practice full-stack development, team collaboration, version control using GitHub, and building a practical event management platform.
 
----
-
-
----
-
 **Example events:**
 
 * Tech conferences
@@ -35,28 +30,20 @@ The system is built using modern web technologies with a structured frontend and
 Handles user accounts.
 **Functions:** Register, Login, Logout, Profile
 
----
-
 ### Module 2 — Event Management Module
 
 Stores and displays events.
 **Functions:** Add events, Edit events, View details, Event listing
-
----
 
 ### Module 3 — Event Discovery Module
 
 Helps users find events.
 **Functions:** Browse events, Filter by category, Search by event name
 
----
-
 ### Module 4 — Ticket Booking Module
 
 Allows users to book tickets.
 **Functions:** Select ticket quantity, Confirm booking, Save booking in database
-
----
 
 ### Module 5 — User Dashboard
 
@@ -109,8 +96,6 @@ View Bookings
 
 **Backend:** User API, Authentication middleware
 
----
-
 ### Member 2 — Event Creation & Management
 
 **Responsibilities:**
@@ -121,8 +106,6 @@ View Bookings
 
 **Database Tables:** `events`, `event_categories`
 
----
-
 ### Member 3 — Event Discovery / Listing
 
 **Responsibilities:**
@@ -130,8 +113,6 @@ View Bookings
 * Display events, Search & Filter, Event cards UI
 
 **Pages:** Home, Event Listing, Event Details
-
----
 
 ### Member 4 — Ticket Booking System
 
@@ -142,8 +123,6 @@ View Bookings
 **Pages:** Booking, Confirmation
 
 **Database Tables:** `bookings`, `tickets`
-
----
 
 ### Member 5 — User Dashboard & Booking History
 
@@ -279,4 +258,5 @@ feature/event-listing
 feature/ticket-booking
 feature/user-dashboard
 ```
+
 
