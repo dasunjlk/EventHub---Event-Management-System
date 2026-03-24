@@ -1,0 +1,204 @@
+import { Link } from 'react-router-dom'
+import EventCard from '../components/EventCard'
+import events from '../data/events'
+
+const categories = [
+  {
+    name: 'Music',
+    icon: '🎵',
+    color: 'from-pink-600/20 to-pink-900/20 border-pink-800/50 hover:border-pink-600',
+    textColor: 'text-pink-300',
+  },
+  {
+    name: 'Tech',
+    icon: '💻',
+    color: 'from-blue-600/20 to-blue-900/20 border-blue-800/50 hover:border-blue-600',
+    textColor: 'text-blue-300',
+  },
+  {
+    name: 'Art',
+    icon: '🎨',
+    color: 'from-purple-600/20 to-purple-900/20 border-purple-800/50 hover:border-purple-600',
+    textColor: 'text-purple-300',
+  },
+  {
+    name: 'Education',
+    icon: '📚',
+    color: 'from-green-600/20 to-green-900/20 border-green-800/50 hover:border-green-600',
+    textColor: 'text-green-300',
+  },
+  {
+    name: 'Workshop',
+    icon: '🔧',
+    color: 'from-amber-600/20 to-amber-900/20 border-amber-800/50 hover:border-amber-600',
+    textColor: 'text-amber-300',
+  },
+]
+
+const featuredEvents = events.slice(0, 6)
+
+const HomePage = () => {
+  return (
+    <>
+      {/* ── Hero Section ── */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950/50 to-gray-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent-600/10 via-transparent to-transparent" />
+
+        {/* Decorative blobs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-600/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 animate-slide-up">
+          {/* Badge */}
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/60 border border-primary-700/50 text-primary-300 text-sm font-medium mb-8">
+            <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
+            10,000+ events listed across Sri Lanka
+          </span>
+
+          {/* Heading */}
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+            Discover{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-400">
+              Amazing Events
+            </span>
+            <br />
+            Near You
+          </h1>
+
+          {/* Subtext */}
+          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Find and book tickets for the best events. Music festivals, tech conferences, art exhibitions and more — all in one place.
+          </p>
+
+          {/* Search bar */}
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10">
+            <div className="relative flex-1">
+              <svg
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                id="hero-search"
+                type="text"
+                placeholder="Search events, artists, venues..."
+                className="input-field pl-12 text-base"
+                readOnly
+              />
+            </div>
+            <Link to="/events" id="hero-browse-btn" className="btn-primary whitespace-nowrap">
+              Browse Events
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-8 text-center">
+            {[
+              { value: '10K+', label: 'Events' },
+              { value: '50K+', label: 'Happy Attendees' },
+              { value: '500+', label: 'Organizers' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-2xl font-black text-white">{stat.value}</p>
+                <p className="text-gray-500 text-sm">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent" />
+      </section>
+
+      {/* ── Categories Section ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-12">
+          <h2 className="section-heading">Browse by Category</h2>
+          <p className="section-subheading">Find events that match your interests</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {categories.map((cat) => (
+            <Link
+              key={cat.name}
+              to={`/events?category=${cat.name}`}
+              id={`category-${cat.name.toLowerCase()}`}
+              className={`flex flex-col items-center gap-3 p-6 rounded-2xl border bg-gradient-to-br ${cat.color} transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group`}
+            >
+              <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
+                {cat.icon}
+              </span>
+              <span className={`font-semibold text-sm ${cat.textColor}`}>
+                {cat.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Featured Events Section ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h2 className="section-heading">Featured Events</h2>
+            <p className="section-subheading">Hand-picked events you'll love</p>
+          </div>
+          <Link
+            to="/events"
+            id="see-all-events-btn"
+            className="btn-outline hidden sm:inline-flex text-sm py-2 px-5"
+          >
+            See All
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredEvents.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </div>
+
+        {/* Mobile see all */}
+        <div className="mt-10 text-center sm:hidden">
+          <Link to="/events" className="btn-outline">
+            See All Events
+          </Link>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ── */}
+      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-3xl overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-500" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-accent-500/30 via-transparent to-transparent" />
+        <div className="relative px-8 py-14 text-center">
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+            Ready to experience something amazing?
+          </h2>
+          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto">
+            Join thousands of people discovering great events every day.
+          </p>
+          <Link to="/events" id="cta-browse-btn" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-700 font-bold rounded-xl hover:bg-primary-50 transition-all duration-200 hover:-translate-y-0.5 shadow-xl">
+            Explore All Events
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default HomePage
