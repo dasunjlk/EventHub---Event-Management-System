@@ -73,7 +73,7 @@ const Home = () => {
 
           {/* Subtext */}
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Find and book tickets for the best events. Music festivals, tech conferences, art exhibitions and more — all in one place.
+            Find and book tickets for the best events. Music festivals, tech conferences, art exhibitions and more. All in one place.
           </p>
 
           {/* Search bar */}
@@ -114,8 +114,8 @@ const Home = () => {
         </div>
 
         <div className="flex justify-center mt-8">
-          <CategoryFilter 
-            categories={['Music', 'Tech', 'Art', 'Education', 'Workshop']} 
+          <CategoryFilter
+            categories={['Music', 'Tech', 'Art', 'Education', 'Workshop']}
             onSelectCategory={(cat) => navigate(`/events?category=${cat}`)}
           />
         </div>
