@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import EventCard from '../components/EventCard'
 import events from '../data/events'
 
 const categoryColors = {
@@ -9,7 +10,7 @@ const categoryColors = {
   Workshop:  'bg-amber-900/60 text-amber-300 border border-amber-800',
 }
 
-const EventDetailsPage = () => {
+const EventDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const event = events.find((e) => e.id === Number(id))
@@ -230,30 +231,7 @@ const EventDetailsPage = () => {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((e) => (
-                <div key={e.id} className="card group flex flex-col">
-                  <div className="relative overflow-hidden aspect-[16/9]">
-                    <img
-                      src={e.image}
-                      alt={e.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-transparent to-transparent" />
-                  </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{e.title}</h3>
-                    <p className="text-gray-400 text-xs mb-3">
-                      {new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    <Link
-                      to={`/events/${e.id}`}
-                      id={`related-event-${e.id}`}
-                      className="btn-primary text-xs py-2 mt-auto"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
+                <EventCard key={e.id} {...e} />
               ))}
             </div>
           </div>
@@ -263,4 +241,4 @@ const EventDetailsPage = () => {
   )
 }
 
-export default EventDetailsPage
+export default EventDetails

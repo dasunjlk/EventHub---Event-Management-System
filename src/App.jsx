@@ -1,24 +1,19 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import HomePage from './pages/HomePage'
-import EventsPage from './pages/EventsPage'
-import EventDetailsPage from './pages/EventDetailsPage'
+import Layout from './components/Layout'
+import Home from './pages/Home'
+import Events from './pages/Events'
+import EventDetails from './pages/EventDetails'
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/events/:id" element={<EventDetailsPage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   )
 }

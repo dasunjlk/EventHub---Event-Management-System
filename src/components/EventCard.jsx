@@ -8,9 +8,7 @@ const categoryColors = {
   Workshop:  'bg-amber-900/60 text-amber-300 border border-amber-800',
 }
 
-const EventCard = ({ event }) => {
-  const { id, title, date, location, category, price, image } = event
-
+const EventCard = ({ id, title, date, location, price, image, category }) => {
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

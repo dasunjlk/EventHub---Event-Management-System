@@ -1,5 +1,7 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
+import SearchBar from '../components/SearchBar'
+import CategoryFilter from '../components/CategoryFilter'
 import events from '../data/events'
 
 const categories = [
@@ -37,7 +39,8 @@ const categories = [
 
 const featuredEvents = events.slice(0, 6)
 
-const HomePage = () => {
+const Home = () => {
+  const navigate = useNavigate()
   return (
     <>
       {/* ── Hero Section ── */}
@@ -74,24 +77,8 @@ const HomePage = () => {
           </p>
 
           {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10">
-            <div className="relative flex-1">
-              <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                id="hero-search"
-                type="text"
-                placeholder="Search events, artists, venues..."
-                className="input-field pl-12 text-base"
-                readOnly
-              />
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full">
+            <SearchBar placeholder="Search events, artists, venues..." />
             <Link to="/events" id="hero-browse-btn" className="btn-primary whitespace-nowrap">
               Browse Events
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,22 +113,11 @@ const HomePage = () => {
           <p className="section-subheading">Find events that match your interests</p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((cat) => (
-            <Link
-              key={cat.name}
-              to={`/events?category=${cat.name}`}
-              id={`category-${cat.name.toLowerCase()}`}
-              className={`flex flex-col items-center gap-3 p-6 rounded-2xl border bg-gradient-to-br ${cat.color} transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group`}
-            >
-              <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                {cat.icon}
-              </span>
-              <span className={`font-semibold text-sm ${cat.textColor}`}>
-                {cat.name}
-              </span>
-            </Link>
-          ))}
+        <div className="flex justify-center mt-8">
+          <CategoryFilter 
+            categories={['Music', 'Tech', 'Art', 'Education', 'Workshop']} 
+            onSelectCategory={(cat) => navigate(`/events?category=${cat}`)}
+          />
         </div>
       </section>
 
@@ -166,7 +142,7 @@ const HomePage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard key={event.id} {...event} />
           ))}
         </div>
 
@@ -201,4 +177,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default Home
