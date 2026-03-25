@@ -11,7 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
-
+branches-utf8.txt
+branches.txt
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
