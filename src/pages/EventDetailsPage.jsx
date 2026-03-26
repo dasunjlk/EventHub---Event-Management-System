@@ -210,14 +210,21 @@ const EventDetailsPage = () => {
 
               <button
                 id="book-ticket-btn"
+                onClick={() => navigate('/booking-success', {
+                  state: {
+                    bookingDetails: {
+                      eventTitle: title,
+                      ticketQuantity: 1,
+                      totalPrice: price,
+                      bookingId: "BKG-" + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                      bookingDate: new Date().toISOString()
+                    }
+                  }
+                })}
                 className="btn-accent w-full text-base py-3.5"
               >
                 🎟️ Book Ticket
               </button>
-
-              <p className="text-center text-gray-600 text-xs mt-4">
-                No action performed — UI only
-              </p>
             </div>
           </div>
         </div>

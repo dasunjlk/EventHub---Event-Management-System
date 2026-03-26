@@ -6,6 +6,8 @@ import EventsPage from './pages/EventsPage'
 import EventDetailsPage from './pages/EventDetailsPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import BookingPage from './pages/BookingPage'
+import BookingSuccess from './pages/BookingSuccess'
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
             <Route path="/events/:id" element={<EventDetailsPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/booking/:eventId" element={<BookingPage />} />
+            <Route path="/booking-success" element={<BookingSuccess />} />
           </Routes>
         </main>
         <Footer />
