@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
@@ -15,17 +15,37 @@ const Events = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     categories.includes(initialCategory) ? initialCategory : 'All'
   )
+  const [allEvents, setAllEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Simulate fetching data to demonstrate state usage
+    const fetchEvents = () => {
+      setAllEvents(events)
+      setLoading(false)
+    }
+    const timer = setTimeout(fetchEvents, 500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Keep category in sync with query param changes (e.g., coming from Home page chips)
+  useEffect(() => {
+    if (categories.includes(initialCategory) && initialCategory !== selectedCategory) {
+      setSelectedCategory(initialCategory)
+    }
+  }, [initialCategory, selectedCategory])
 
   const filtered = useMemo(() => {
-    return events.filter((e) => {
+    const term = search.trim().toLowerCase()
+    return allEvents.filter((e) => {
       const matchesSearch =
-        e.title.toLowerCase().includes(search.toLowerCase()) ||
-        e.location.toLowerCase().includes(search.toLowerCase())
+        e.title.toLowerCase().includes(term) ||
+        e.location.toLowerCase().includes(term)
       const matchesCategory =
         selectedCategory === 'All' || e.category === selectedCategory
       return matchesSearch && matchesCategory
     })
-  }, [search, selectedCategory])
+  }, [allEvents, search, selectedCategory])
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -95,7 +115,13 @@ const Events = () => {
         </div>
 
         {/* Events Grid */}
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-24 animate-pulse">
+            <div className="inline-block w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <h3 className="text-xl font-bold text-white mb-2">Loading events...</h3>
+            <p className="text-gray-400">Fetching latest events locally.</p>
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((event) => (
               <EventCard key={event.id} {...event} />
