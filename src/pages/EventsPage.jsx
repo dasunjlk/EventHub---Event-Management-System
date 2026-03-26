@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
-import events from '../data/events'
+import { eventAPI } from '../services/api'
 
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
@@ -13,6 +13,22 @@ const EventsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     categories.includes(initialCategory) ? initialCategory : 'All'
   )
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await eventAPI.getAllEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, [])
 
   const filtered = useMemo(() => {
     return events.filter((e) => {
@@ -115,7 +131,11 @@ const EventsPage = () => {
         </div>
 
         {/* Events Grid */}
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-24">
+            <h3 className="text-2xl font-bold text-white mb-2">Loading events...</h3>
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((event) => (
               <EventCard key={event.id} event={event} />
