@@ -1,9 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
-import SearchBar from '../components/SearchBar'
-import CategoryFilter from '../components/CategoryFilter'
-import events from '../data/events'
+import { eventAPI } from '../services/api'
 
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
@@ -15,25 +13,22 @@ const Events = () => {
   const [selectedCategory, setSelectedCategory] = useState(
     categories.includes(initialCategory) ? initialCategory : 'All'
   )
-  const [allEvents, setAllEvents] = useState([])
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate fetching data to demonstrate state usage
-    const fetchEvents = () => {
-      setAllEvents(events)
-      setLoading(false)
-    }
-    const timer = setTimeout(fetchEvents, 500)
-    return () => clearTimeout(timer)
+    const fetchEvents = async () => {
+      try {
+        const data = await eventAPI.getAllEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
   }, [])
-
-  // Keep category in sync with query param changes (e.g., coming from Home page chips)
-  useEffect(() => {
-    if (categories.includes(initialCategory) && initialCategory !== selectedCategory) {
-      setSelectedCategory(initialCategory)
-    }
-  }, [initialCategory, selectedCategory])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -116,10 +111,8 @@ const Events = () => {
 
         {/* Events Grid */}
         {loading ? (
-          <div className="text-center py-24 animate-pulse">
-            <div className="inline-block w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <h3 className="text-xl font-bold text-white mb-2">Loading events...</h3>
-            <p className="text-gray-400">Fetching latest events locally.</p>
+          <div className="text-center py-24">
+            <h3 className="text-2xl font-bold text-white mb-2">Loading events...</h3>
           </div>
         ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
