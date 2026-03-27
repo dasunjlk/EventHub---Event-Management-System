@@ -1,16 +1,14 @@
 import { Link } from 'react-router-dom'
 
 const categoryColors = {
-  Music:     'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech:      'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art:       'bg-purple-900/60 text-purple-300 border border-purple-800',
+  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
+  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
+  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
   Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop:  'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
 }
 
-const EventCard = ({ event }) => {
-  const { id, title, date, location, category, price, image } = event
-
+const EventCard = ({ id, title, date, location, price, image, category }) => {
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

@@ -30,3 +30,31 @@ export const authAPI = {
     });
   }
 };
+
+const BASE_URL = 'http://localhost:5000/api';
+
+export const eventAPI = {
+  getAllEvents: async () => {
+    const res = await fetch(`${BASE_URL}/events`);
+    if (!res.ok) throw new Error('Failed to fetch events');
+    const data = await res.json();
+    return data.map(event => ({
+      ...event,
+      id: event._id,
+      price: event.ticket_price
+    }));
+  },
+  createEvent: async (eventData) => {
+    const res = await fetch(`${BASE_URL}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...eventData,
+        ticket_price: Number(eventData.ticket_price),
+        available_tickets: Number(eventData.available_tickets)
+      }),
+    });
+    if (!res.ok) throw new Error('Failed to create event');
+    return res.json();
+  }
+};

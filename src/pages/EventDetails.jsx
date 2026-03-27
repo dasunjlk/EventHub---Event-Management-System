@@ -1,24 +1,46 @@
+import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import EventCard from '../components/EventCard'
 import events from '../data/events'
 
 const categoryColors = {
-  Music:     'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech:      'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art:       'bg-purple-900/60 text-purple-300 border border-purple-800',
+  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
+  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
+  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
   Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop:  'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
 }
 
-const EventDetailsPage = () => {
+const EventDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const event = events.find((e) => e.id === Number(id))
+  const [currentEvent, setCurrentEvent] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!event) {
+  useEffect(() => {
+    setLoading(true)
+    const timer = setTimeout(() => {
+      const found = events.find((e) => e.id === Number(id))
+      setCurrentEvent(found || null)
+      setLoading(false)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    )
+  }
+
+  if (!currentEvent) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center pt-20 px-4 text-center">
-        <div className="text-7xl mb-6">😕</div>
-        <h1 className="text-3xl font-black text-white mb-3">Event Not Found</h1>
+        <div className="text-7xl mb-6">:(</div>
+        <h1 className="text-3xl font-black text-white mb-3">Event not found</h1>
         <p className="text-gray-400 mb-8 max-w-md">
           The event you're looking for doesn't exist or may have been removed.
         </p>
@@ -31,8 +53,8 @@ const EventDetailsPage = () => {
 
   const {
     title, date, time, location, category, price,
-    image, description, organizer, seats
-  } = event
+    image, description, organizer, seats,
+  } = currentEvent
 
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -45,8 +67,7 @@ const EventDetailsPage = () => {
 
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`
 
-  // Related events (same category, excluding current)
-  const related = events.filter((e) => e.category === category && e.id !== event.id).slice(0, 3)
+  const related = events.filter((e) => e.category === category && e.id !== currentEvent.id).slice(0, 3)
 
   return (
     <div className="min-h-screen pt-20 pb-20">
@@ -80,7 +101,7 @@ const EventDetailsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ── Left: Main Info ── */}
+          {/* --- Left: Main Info --- */}
           <div className="lg:col-span-2">
             <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-6">
               {title}
@@ -170,7 +191,7 @@ const EventDetailsPage = () => {
             </a>
           </div>
 
-          {/* ── Right: Ticket Box ── */}
+          {/* --- Right: Ticket Box --- */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-2xl">
               <div className="text-center mb-6">
@@ -210,13 +231,14 @@ const EventDetailsPage = () => {
 
               <button
                 id="book-ticket-btn"
+                onClick={() => navigate(`/book/${currentEvent.id}`)}
                 className="btn-accent w-full text-base py-3.5"
               >
-                🎟️ Book Ticket
+                Book Ticket
               </button>
 
               <p className="text-center text-gray-600 text-xs mt-4">
-                No action performed — UI only
+                No action performed - UI only
               </p>
             </div>
           </div>
@@ -230,30 +252,7 @@ const EventDetailsPage = () => {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {related.map((e) => (
-                <div key={e.id} className="card group flex flex-col">
-                  <div className="relative overflow-hidden aspect-[16/9]">
-                    <img
-                      src={e.image}
-                      alt={e.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-transparent to-transparent" />
-                  </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h3 className="text-white font-bold text-sm mb-2 line-clamp-2">{e.title}</h3>
-                    <p className="text-gray-400 text-xs mb-3">
-                      {new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    <Link
-                      to={`/events/${e.id}`}
-                      id={`related-event-${e.id}`}
-                      className="btn-primary text-xs py-2 mt-auto"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
+                <EventCard key={e.id} {...e} />
               ))}
             </div>
           </div>
@@ -263,4 +262,4 @@ const EventDetailsPage = () => {
   )
 }
 
-export default EventDetailsPage
+export default EventDetails
