@@ -51,6 +51,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
+            <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
             <Link
               to="/login"
               id="nav-login-btn"
@@ -95,6 +96,7 @@ const Navbar = () => {
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
+          <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
           <Link
             to="/login"
             id="mobile-nav-login"
