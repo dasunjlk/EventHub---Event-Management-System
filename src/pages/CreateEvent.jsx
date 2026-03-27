@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { eventAPI } from '../services/api';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -15,7 +14,9 @@ const CreateEvent = () => {
     image: ''
   });
 
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const categories = ['Music', 'Tech', 'Art', 'Education', 'Workshop'];
 
@@ -34,18 +35,55 @@ const CreateEvent = () => {
       setError('Please fill in all required fields.');
       return;
     }
+    
     setError(null);
+    setLoading(true);
+
     try {
-      await eventAPI.createEvent(formData);
-      navigate('/events');
+      const payload = {
+        ...formData,
+        ticket_price: Number(formData.ticket_price),
+        available_tickets: Number(formData.available_tickets)
+      };
+
+      const response = await fetch('http://localhost:5000/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create event. Please try again.');
+      }
+
+      setSuccess(true);
+      setFormData({
+        title: '',
+        description: '',
+        date: '',
+        location: '',
+        category: '',
+        ticket_price: '',
+        available_tickets: '',
+        image: ''
+      });
+
+      setTimeout(() => {
+        navigate('/manage-events');
+      }, 1500);
+
     } catch (err) {
-      setError(err.message || 'Failed to create event');
+      setError(err.message || 'An error occurred during submission.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
-      <div className="w-full max-w-2xl p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-blue-500 rounded-2xl shadow-2xl">
+      <div className="w-full max-w-2xl p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl">
         <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create New Event</h2>
           <p className="mt-3 text-lg text-gray-400">Host an amazing experience for your audience</p>
@@ -57,10 +95,15 @@ const CreateEvent = () => {
           </div>
         )}
 
+        {success && (
+          <div className="p-4 text-sm text-green-200 bg-green-900/50 border border-green-800 rounded-xl" role="alert">
+            Event created successfully! Redirecting...
+          </div>
+        )}
+
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
 
-            {/* Title */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Event Title *</label>
               <input
@@ -74,7 +117,6 @@ const CreateEvent = () => {
               />
             </div>
 
-            {/* Description */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Description *</label>
               <textarea
@@ -88,7 +130,6 @@ const CreateEvent = () => {
               ></textarea>
             </div>
 
-            {/* Date */}
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">Date *</label>
               <input
@@ -101,7 +142,6 @@ const CreateEvent = () => {
               />
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">Location *</label>
               <input
@@ -115,7 +155,6 @@ const CreateEvent = () => {
               />
             </div>
 
-            {/* Category */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Category *</label>
               <select
@@ -132,7 +171,6 @@ const CreateEvent = () => {
               </select>
             </div>
 
-            {/* Ticket Price */}
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">Ticket Price (LKR) *</label>
               <input
@@ -148,7 +186,6 @@ const CreateEvent = () => {
               />
             </div>
 
-            {/* Available Tickets */}
             <div>
               <label className="block text-sm font-semibold text-gray-300 mb-2">Available Tickets *</label>
               <input
@@ -163,7 +200,6 @@ const CreateEvent = () => {
               />
             </div>
 
-            {/* Event Image */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL (Optional)</label>
               <input
@@ -175,14 +211,15 @@ const CreateEvent = () => {
                 placeholder="https://example.com/image.jpg"
               />
             </div>
+
           </div>
 
           <button
             type="submit"
-            disabled={!isFormValid()}
+            disabled={!isFormValid() || loading}
             className="w-full btn-primary py-3 text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-8 transition-opacity duration-200"
           >
-            Create Event
+            {loading ? 'Creating Event...' : 'Create Event'}
           </button>
         </form>
       </div>
