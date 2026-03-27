@@ -19,19 +19,17 @@ const Navbar = () => {
   }, [])
 
   const navLinkClass = ({ isActive }) =>
-    `text-sm font-semibold transition-colors duration-200 ${
-      isActive
-        ? 'text-primary-400'
-        : 'text-gray-300 hover:text-white'
+    `text-sm font-semibold transition-colors duration-200 ${isActive
+      ? 'text-primary-400'
+      : 'text-gray-300 hover:text-white'
     }`
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || menuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || menuOpen
           ? 'bg-gray-950/95 backdrop-blur-md border-b border-gray-800 shadow-lg'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -52,6 +50,7 @@ const Navbar = () => {
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
             <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+            <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
             <Link
               to="/login"
               id="nav-login-btn"
@@ -69,19 +68,16 @@ const Navbar = () => {
             aria-label="Toggle menu"
           >
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? 'rotate-45 translate-y-2' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''
+                }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? 'opacity-0' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''
+                }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? '-rotate-45 -translate-y-2' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''
+                }`}
             />
           </button>
         </div>
@@ -89,14 +85,14 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${
-          menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
           <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+          <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
           <Link
             to="/login"
             id="mobile-nav-login"
