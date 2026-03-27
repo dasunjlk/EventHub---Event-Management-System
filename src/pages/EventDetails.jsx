@@ -231,7 +231,7 @@ const EventDetails = () => {
 
               <button
                 id="book-ticket-btn"
-                onClick={() => navigate('/booking')}
+                onClick={() => navigate(`/book/${currentEvent.id}`)}
                 className="btn-accent w-full text-base py-3.5"
               >
                 Book Ticket
