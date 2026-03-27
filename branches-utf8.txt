@@ -1,0 +1,6 @@
+﻿  origin/Development
+  origin/HEAD -> origin/main
+  origin/feature/-Event-Discovery-or-Listing
+  origin/feature/event-discovery
+  origin/feature/event-management
+  origin/main

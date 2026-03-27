@@ -5,7 +5,7 @@ import { eventAPI } from '../services/api'
 
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
-const EventsPage = () => {
+const Events = () => {
   const [searchParams] = useSearchParams()
   const initialCategory = searchParams.get('category') || 'All'
 
@@ -31,15 +31,16 @@ const EventsPage = () => {
   }, [])
 
   const filtered = useMemo(() => {
-    return events.filter((e) => {
+    const term = search.trim().toLowerCase()
+    return allEvents.filter((e) => {
       const matchesSearch =
-        e.title.toLowerCase().includes(search.toLowerCase()) ||
-        e.location.toLowerCase().includes(search.toLowerCase())
+        e.title.toLowerCase().includes(term) ||
+        e.location.toLowerCase().includes(term)
       const matchesCategory =
         selectedCategory === 'All' || e.category === selectedCategory
       return matchesSearch && matchesCategory
     })
-  }, [search, selectedCategory])
+  }, [allEvents, search, selectedCategory])
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -60,24 +61,11 @@ const EventsPage = () => {
         {/* Search + Filter Row */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           {/* Search */}
-          <div className="relative flex-1">
-            <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              id="events-search"
-              type="text"
-              placeholder="Search by title or location..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="input-field pl-12"
-            />
-          </div>
+          <SearchBar 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            placeholder="Search by title or location..." 
+          />
 
           {/* Category Dropdown */}
           <div className="relative sm:w-52">
@@ -113,21 +101,12 @@ const EventsPage = () => {
         </div>
 
         {/* Category Pills */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              id={`filter-pill-${cat.toLowerCase()}`}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                selectedCategory === cat
-                  ? 'bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-900/30'
-                  : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:border-primary-600 hover:text-primary-300'
-              }`}
-            >
-              {cat === 'All' ? 'All Categories' : cat}
-            </button>
-          ))}
+        <div className="mb-8">
+          <CategoryFilter 
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
         </div>
 
         {/* Events Grid */}
@@ -138,7 +117,7 @@ const EventsPage = () => {
         ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.id} {...event} />
             ))}
           </div>
         ) : (
@@ -161,4 +140,4 @@ const EventsPage = () => {
   )
 }
 
-export default EventsPage
+export default Events

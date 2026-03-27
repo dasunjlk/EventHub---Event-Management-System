@@ -35,7 +35,7 @@ const Register = () => {
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create Account</h2>
           <p className="mt-3 text-lg text-gray-400">Join EventHub today</p>
         </div>
-        
+
         {error && (
           <div className="p-4 text-sm text-red-200 bg-red-900/50 border border-red-800 rounded-xl" role="alert">
             {error}
@@ -84,7 +84,7 @@ const Register = () => {
               placeholder="••••••••"
             />
           </div>
-          
+
           <button
             type="submit"
             disabled={loading || success}
@@ -93,7 +93,7 @@ const Register = () => {
             {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
-        
+
         <div className="flex items-center space-x-4">
           <div className="flex-1 border-t border-gray-700"></div>
           <span className="text-sm font-medium text-gray-500">or</span>
@@ -125,7 +125,7 @@ const Register = () => {
           </svg>
           Sign up with Google
         </button>
-        
+
         <p className="text-center text-gray-400">
           Already have an account?{' '}
           <Link to="/login" className="font-semibold text-primary-400 hover:text-primary-300 transition-colors">

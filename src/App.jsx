@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
-import HomePage from './pages/HomePage'
-import EventsPage from './pages/EventsPage'
-import EventDetailsPage from './pages/EventDetailsPage'
+import Home from './pages/Home'
+import Events from './pages/Events'
+import EventDetails from './pages/EventDetails'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CreateEvent from './pages/CreateEvent'
@@ -17,9 +17,9 @@ function App() {
         <Navbar />
         <main className="flex-1">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/events/:id" element={<EventDetailsPage />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/create-event" element={<CreateEvent />} />
