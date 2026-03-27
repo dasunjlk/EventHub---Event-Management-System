@@ -210,14 +210,11 @@ const EventDetailsPage = () => {
 
               <button
                 id="book-ticket-btn"
+                onClick={() => navigate(`/book/${event.id}`)}
                 className="btn-accent w-full text-base py-3.5"
               >
                 🎟️ Book Ticket
               </button>
-
-              <p className="text-center text-gray-600 text-xs mt-4">
-                No action performed — UI only
-              </p>
             </div>
           </div>
         </div>

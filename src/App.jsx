@@ -7,6 +7,8 @@ import EventDetailsPage from './pages/EventDetailsPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CreateEvent from './pages/CreateEvent'
+import BookingPage from './pages/BookingPage'
+import BookingSuccess from './pages/BookingSuccess'
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/book/:eventId" element={<BookingPage />} />
+            <Route path="/booking-success" element={<BookingSuccess />} />
           </Routes>
         </main>
         <Footer />
