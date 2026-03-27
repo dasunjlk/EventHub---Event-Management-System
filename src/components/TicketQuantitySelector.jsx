@@ -14,7 +14,7 @@ const TicketQuantitySelector = ({ quantity, setQuantity }) => {
       >
         -
       </button>
-      <span className="text-xl font-semibold w-8 text-center">{quantity}</span>
+      <span className="text-xl font-bold text-gray-500 w-8 text-center">{quantity}</span>
       <button
         onClick={handleIncrement}
         className="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300 transition font-bold text-xl"
