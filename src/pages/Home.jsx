@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
@@ -41,6 +42,15 @@ const featuredEvents = events.slice(0, 6)
 
 const Home = () => {
   const navigate = useNavigate()
+  const [authError, setAuthError] = useState('')
+
+  const handleCreateEventClick = (e) => {
+    if (!localStorage.getItem('token')) {
+      e.preventDefault()
+      setAuthError('Please login to host events')
+      setTimeout(() => setAuthError(''), 3000)
+    }
+  }
   return (
     <>
       {/* ── Hero Section ── */}
@@ -151,6 +161,33 @@ const Home = () => {
           <Link to="/events" className="btn-outline">
             See All Events
           </Link>
+        </div>
+      </section>
+
+      {/* ── Host Event CTA ── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-10">
+        <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-3xl p-10 sm:p-14 shadow-2xl relative overflow-hidden group text-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/10 via-transparent to-accent-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10">
+            <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">Want to host an event?</h2>
+            <p className="text-gray-400 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
+              Create and manage your own events easily and reach a wider audience.
+            </p>
+            <div className="relative inline-flex flex-col items-center">
+              <Link 
+                to="/create-event" 
+                onClick={handleCreateEventClick}
+                className="btn-primary py-3.5 px-8 text-lg font-bold shadow-lg hover:shadow-primary-500/25 hover:-translate-y-1 transition-all duration-300"
+              >
+                Create Event
+              </Link>
+              {authError && (
+                <div className="absolute top-full mt-3 px-4 py-2 bg-red-900/90 border border-red-800 text-red-200 text-sm font-semibold rounded-lg shadow-xl whitespace-nowrap animate-fadeIn z-20">
+                  {authError}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 

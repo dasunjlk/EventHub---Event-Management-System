@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 
@@ -68,7 +68,16 @@ const statusColors = {
 }
 
 export default function Dashboard() {
+    const [authError, setAuthError] = useState('')
     const today = new Date()
+
+    const handleManageEventsClick = (e) => {
+        if (!localStorage.getItem('token')) {
+            e.preventDefault()
+            setAuthError('Please login to manage events')
+            setTimeout(() => setAuthError(''), 3000)
+        }
+    }
 
     const upcomingBookings = mockBookings.filter(
         (booking) => new Date(`${booking.eventDate}T00:00:00`) >= new Date(today.toDateString())
@@ -101,10 +110,24 @@ export default function Dashboard() {
                             </p>
                         </div>
 
-                        <div className="flex gap-3">
-                            <Link to="/events" className="btn-primary">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Link to="/events" className="btn-primary whitespace-nowrap">
                                 Browse Events
                             </Link>
+                            <div className="relative inline-flex flex-col items-center">
+                                <Link 
+                                    to="/manage-events" 
+                                    onClick={handleManageEventsClick}
+                                    className="btn-outline whitespace-nowrap shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    Manage Events
+                                </Link>
+                                {authError && (
+                                    <div className="absolute top-full mt-2 px-3 py-1.5 bg-red-900/90 border border-red-800 text-red-200 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-slide-up z-20">
+                                        {authError}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </section>
