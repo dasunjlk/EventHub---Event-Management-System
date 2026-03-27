@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -19,19 +26,17 @@ const Navbar = () => {
   }, [])
 
   const navLinkClass = ({ isActive }) =>
-    `text-sm font-semibold transition-colors duration-200 ${
-      isActive
-        ? 'text-primary-400'
-        : 'text-gray-300 hover:text-white'
+    `text-sm font-semibold transition-colors duration-200 ${isActive
+      ? 'text-primary-400'
+      : 'text-gray-300 hover:text-white'
     }`
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || menuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || menuOpen
           ? 'bg-gray-950/95 backdrop-blur-md border-b border-gray-800 shadow-lg'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -51,14 +56,26 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
-            <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
-            <Link
-              to="/login"
-              id="nav-login-btn"
-              className="btn-primary text-sm py-2 px-5"
-            >
-              Login
-            </Link>
+            {localStorage.getItem('token') ? (
+              <>
+                <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 px-5"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                id="nav-login-btn"
+                className="btn-primary text-sm py-2 px-5"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile Hamburger */}
@@ -69,19 +86,16 @@ const Navbar = () => {
             aria-label="Toggle menu"
           >
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? 'rotate-45 translate-y-2' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''
+                }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? 'opacity-0' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''
+                }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${
-                menuOpen ? '-rotate-45 -translate-y-2' : ''
-              }`}
+              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''
+                }`}
             />
           </button>
         </div>
@@ -89,21 +103,32 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${
-          menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
-          <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
-          <Link
-            to="/login"
-            id="mobile-nav-login"
-            className="btn-primary text-sm py-2 text-center mt-1"
-          >
-            Login
-          </Link>
+          {localStorage.getItem('token') ? (
+            <>
+              <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
+              <button
+                onClick={handleLogout}
+                className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 text-center mt-1"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              id="mobile-nav-login"
+              className="btn-primary text-sm py-2 text-center mt-1"
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>

@@ -9,6 +9,8 @@ import Register from './pages/Register'
 import CreateEvent from './pages/CreateEvent'
 import BookingPage from './pages/BookingPage'
 import BookingSuccess from './pages/BookingSuccess'
+import Dashboard from './pages/Dashboard'
+import ManageEvents from './pages/ManageEvents'
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/create-event" element={<CreateEvent />} />
             <Route path="/book/:eventId" element={<BookingPage />} />
             <Route path="/booking-success" element={<BookingSuccess />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/manage-events" element={<ManageEvents />} />
           </Routes>
         </main>
         <Footer />

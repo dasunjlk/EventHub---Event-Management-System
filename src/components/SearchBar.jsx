@@ -1,4 +1,4 @@
-export default function SearchBar({ value, onChange, placeholder = 'Search events...' }) {
+export default function SearchBar({ value = '', onChange = () => {}, placeholder = 'Search events...' }) {
   return (
     <div className="relative flex-1 w-full max-w-2xl mx-auto">
       <svg
@@ -14,7 +14,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Search event
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="input-field pl-12 text-base w-full"
+        className="input-field pl-12 text-base w-full transition-all duration-200"
       />
     </div>
   )
