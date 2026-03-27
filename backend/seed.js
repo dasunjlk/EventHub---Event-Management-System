@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Event from './models/Event.js';
+import User from './models/User.js';
 
 dotenv.config();
 
@@ -94,10 +95,17 @@ const seedDB = async () => {
     
     // Clear existing events to prevent duplicates, if you prefer not to clear them you can remove this
     await Event.deleteMany({});
-    console.log('Cleared existing events');
+    await User.deleteMany({});
+    console.log('Cleared existing events and users');
 
     await Event.insertMany(events);
-    console.log('Database seeded with 8 dummy events!');
+    await User.create({
+      name: 'Test Administrator',
+      email: 'test@example.com',
+      password: 'password123',
+      role: 'admin'
+    });
+    console.log('Database seeded with 8 dummy events and 1 test user!');
     
     process.exit(0);
   } catch (error) {
