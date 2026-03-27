@@ -49,7 +49,9 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
-            <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+            {localStorage.getItem('token') && (
+              <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+            )}
             <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
             <Link
               to="/login"
@@ -91,7 +93,9 @@ const Navbar = () => {
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
-          <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+          {localStorage.getItem('token') && (
+            <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+          )}
           <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
           <Link
             to="/login"
