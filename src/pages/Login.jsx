@@ -18,10 +18,14 @@ const Login = () => {
     setError(null);
     try {
       const response = await authAPI.login(formData);
-      // Store mock token
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      navigate('/'); // Redirecting to home since dashboard might not be ready
+      localStorage.setItem('user', JSON.stringify({
+        _id: response.data._id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role
+      }));
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

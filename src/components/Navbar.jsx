@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -49,17 +56,26 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
-            {localStorage.getItem('token') && (
-              <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+            {localStorage.getItem('token') ? (
+              <>
+                <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 px-5"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                id="nav-login-btn"
+                className="btn-primary text-sm py-2 px-5"
+              >
+                Login
+              </Link>
             )}
-            <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
-            <Link
-              to="/login"
-              id="nav-login-btn"
-              className="btn-primary text-sm py-2 px-5"
-            >
-              Login
-            </Link>
           </div>
 
           {/* Mobile Hamburger */}
@@ -93,17 +109,26 @@ const Navbar = () => {
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
-          {localStorage.getItem('token') && (
-            <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+          {localStorage.getItem('token') ? (
+            <>
+              <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
+              <button
+                onClick={handleLogout}
+                className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 text-center mt-1"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              id="mobile-nav-login"
+              className="btn-primary text-sm py-2 text-center mt-1"
+            >
+              Login
+            </Link>
           )}
-          <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
-          <Link
-            to="/login"
-            id="mobile-nav-login"
-            className="btn-primary text-sm py-2 text-center mt-1"
-          >
-            Login
-          </Link>
         </div>
       </div>
     </nav>
