@@ -65,7 +65,7 @@ const EventDetails = () => {
 
   const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
 
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`
+  const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(location)}`
 
   const related = events.filter((e) => e.category === category && e.id !== currentEvent.id).slice(0, 3)
 
@@ -231,7 +231,7 @@ const EventDetails = () => {
 
               <button
                 id="book-ticket-btn"
-                onClick={() => navigate(`/book/${currentEvent.id}`)}
+                onClick={() => navigate('/booking')}
                 className="btn-accent w-full text-base py-3.5"
               >
                 Book Ticket
