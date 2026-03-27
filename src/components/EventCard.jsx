@@ -18,7 +18,7 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
   const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
 
   return (
-    <div className="card group flex flex-col">
+    <div className="card group flex flex-col hover:scale-[1.01]">
       {/* Image */}
       <div className="relative overflow-hidden aspect-[16/9]">
         <img
