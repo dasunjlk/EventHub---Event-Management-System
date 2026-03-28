@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
 import CategoryFilter from '../components/CategoryFilter'
-import dummyEvents from '../data/events'
 
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
@@ -19,12 +18,26 @@ const Events = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setEvents(dummyEvents)
-      setLoading(false)
-    }, 250)
-
-    return () => clearTimeout(timer)
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('http://localhost:5000/api/events');
+        if (!res.ok) throw new Error('Failed to fetch events');
+        const data = await res.json();
+        
+        const formattedData = data.map(ev => ({
+          ...ev,
+          id: ev._id || ev.id,
+          price: ev.ticket_price
+        }));
+        setEvents(formattedData);
+      } catch (err) {
+        console.error('Could not load events:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
   }, [])
 
   useEffect(() => {
