@@ -4,6 +4,13 @@ const api = axios.create({
   baseURL: 'http://localhost:5000/api',
 });
 
+const mapEvent = (event) => ({
+  ...event,
+  id: event._id || event.id,
+  price: event.ticket_price,
+  seats: event.available_tickets
+});
+
 // Add a request interceptor to attach JWT token
 api.interceptors.request.use(
   (config) => {
@@ -31,12 +38,11 @@ export const authAPI = {
 export const eventAPI = {
   getAllEvents: async () => {
     const res = await api.get('/events');
-    // Map backend `_id` to `id` for frontend consistency if needed
-    return res.data.map(event => ({
-      ...event,
-      id: event._id,
-      price: event.ticket_price
-    }));
+    return res.data.map(mapEvent);
+  },
+  getEventById: async (id) => {
+    const res = await api.get(`/events/${id}`);
+    return mapEvent(res.data);
   },
   createEvent: async (eventData) => {
     const res = await api.post('/events', {
