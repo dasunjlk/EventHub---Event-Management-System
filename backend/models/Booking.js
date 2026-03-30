@@ -2,11 +2,13 @@ import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   eventId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
     required: true
   },
   ticketQuantity: {
