@@ -13,10 +13,10 @@ const BookingSuccess = () => {
 
   const {
     eventTitle,
-    ticketQuantity,
-    totalPrice,
+    ticket_quantity: ticketQuantity,
+    total_price: totalPrice,
     bookingId,
-    bookingDate
+    booking_date: bookingDate
   } = bookingDetails;
 
   const formattedDate = new Date(bookingDate).toLocaleString();

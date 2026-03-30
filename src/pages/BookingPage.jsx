@@ -61,12 +61,14 @@ const BookingPage = () => {
   const handleConfirmBooking = async () => {
     setIsBooking(true);
     try {
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const validUserId = user ? (user._id || user.id) : "000000000000000000000000";
+
       const bookingData = {
-        userId: "demoUser",
-        eventId: event.id,
-        ticketQuantity: quantity,
-        totalPrice: event.price * quantity,
-        eventTitle: event.title // passed to success page for display
+        user_id: validUserId,
+        event_id: event._id || event.id,
+        ticket_quantity: quantity
       };
       
       const response = await createBooking(bookingData);
