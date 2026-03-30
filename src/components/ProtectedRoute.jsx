@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md">
         <div className="text-white text-xl animate-pulse">Verifying session...</div>
       </div>
     );
