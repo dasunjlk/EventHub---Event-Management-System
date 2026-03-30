@@ -97,7 +97,7 @@ export default function MyBookings() {
           ) : error ? (
             <div className="glass-panel p-8 bg-red-500/5 border-red-500/20 text-center">
               <p className="text-red-300 text-lg mb-4">{error}</p>
-              <button 
+              <button
                 onClick={fetchBookings}
                 className="glass-btn px-8"
               >
@@ -119,10 +119,10 @@ export default function MyBookings() {
             <div className="grid gap-6">
               {bookings.map((booking) => {
                 const event = booking.event || {};
-                
+
                 // Determine status class based on booking status, default to Confirmed format
-                const statusLabel = booking.status 
-                  ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) 
+                const statusLabel = booking.status
+                  ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
                   : 'Confirmed';
                 const statusClass = statusColors[statusLabel] || statusColors['Confirmed'];
 
@@ -138,7 +138,7 @@ export default function MyBookings() {
                           {statusLabel}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-400 mb-6">
                         {event.date && (
                           <div className="flex items-center gap-2">

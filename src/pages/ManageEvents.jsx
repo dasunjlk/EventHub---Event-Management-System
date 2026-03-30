@@ -21,7 +21,7 @@ const ManageEvents = () => {
       const res = await fetch('http://localhost:5000/api/events');
       if (!res.ok) throw new Error('Failed to fetch events');
       const data = await res.json();
-      
+
       const formattedData = data.map(ev => ({
         ...ev,
         id: ev._id || ev.id
@@ -56,8 +56,8 @@ const ManageEvents = () => {
     if (formattedDate.includes('Z')) {
       formattedDate = new Date(formattedDate).toISOString().slice(0, 16);
     }
-    
-    setEditFormData({ 
+
+    setEditFormData({
       ...event,
       date: formattedDate
     });
@@ -88,11 +88,11 @@ const ManageEvents = () => {
         },
         body: JSON.stringify(payload)
       });
-      
+
       if (!res.ok) throw new Error('Failed to update event');
       const responseData = await res.json();
       const updatedEvent = responseData.event || responseData;
-      
+
       const formattedUpdatedEvent = {
         ...updatedEvent,
         id: updatedEvent._id || updatedEvent.id
@@ -116,7 +116,7 @@ const ManageEvents = () => {
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
       <div className="w-full max-w-4xl space-y-8">
-        
+
         {/* Header Section */}
         <div className="text-center glass-panel shadow-2xl border-white/20 p-8">
           <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">Manage Events</h2>
@@ -141,35 +141,35 @@ const ManageEvents = () => {
           /* Event List */
           <div className="space-y-6">
             {events.map((event) => (
-              <div 
-                key={event.id} 
+              <div
+                key={event.id}
                 className="glass-panel p-6 shadow-2xl transition-all duration-300 hover:border-white/30"
               >
                 {editingId === event.id ? (
                   /* Inline Edit Form */
                   <form onSubmit={saveEdit} className="space-y-6 animate-fadeIn">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Event Title *</label>
                         <input type="text" name="title" value={editFormData.title || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Description *</label>
                         <textarea name="description" value={editFormData.description || ''} onChange={handleEditChange} required rows="3" className="input-field w-full resize-none"></textarea>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Date *</label>
                         <input type="datetime-local" name="date" value={editFormData.date || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Location *</label>
                         <input type="text" name="location" value={editFormData.location || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Category *</label>
                         <select name="category" value={editFormData.category || ''} onChange={handleEditChange} required className="input-field w-full text-white [&>option]:bg-black">
@@ -177,17 +177,17 @@ const ManageEvents = () => {
                           {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Ticket Price (LKR) *</label>
                         <input type="number" name="ticket_price" value={editFormData.ticket_price ?? ''} onChange={handleEditChange} required min="0" step="0.01" className="input-field w-full" />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Available Tickets *</label>
                         <input type="number" name="available_tickets" value={editFormData.available_tickets ?? ''} onChange={handleEditChange} required min="0" className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL (Optional)</label>
                         <input type="url" name="image" value={editFormData.image || ''} onChange={handleEditChange} className="input-field w-full" />
@@ -210,13 +210,13 @@ const ManageEvents = () => {
                           {event.category}
                         </span>
                       </div>
-                      
+
                       <p className="text-gray-400 text-sm mb-5 line-clamp-2">{event.description}</p>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 text-sm text-gray-300">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500">📅</span>
-                          <span>{new Date(event.date).toLocaleDateString()} at {new Date(event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                          <span>{new Date(event.date).toLocaleDateString()} at {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500">📍</span>
@@ -232,15 +232,15 @@ const ManageEvents = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex sm:flex-col gap-3 md:min-w-[120px] mt-4 md:mt-0">
-                      <button 
+                      <button
                         onClick={() => startEdit(event)}
                         className="flex-1 glass-btn text-white border-white/20 hover:border-white/40 shadow-sm"
                       >
                         Edit
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(event.id)}
                         className="flex-1 glass-btn text-white border-red-500/50 hover:bg-red-500/20 shadow-sm"
                       >

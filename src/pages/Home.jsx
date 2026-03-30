@@ -50,7 +50,7 @@ const Home = () => {
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         
-        const formattedData = data.map(ev => ({
+        const formattedData = (data || []).filter(ev => ev !== null).map(ev => ({
           ...ev,
           id: ev._id || ev.id,
           price: ev.ticket_price
@@ -91,13 +91,13 @@ const Home = () => {
           </span>
 
           {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-md">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-2xl">
             Discover{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 drop-shadow-sm">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 animate-gradient-x">
               Amazing Events
             </span>
             <br />
-            Near You
+            <span className="text-gray-200">Near You</span>
           </h1>
 
           {/* Subtext */}
