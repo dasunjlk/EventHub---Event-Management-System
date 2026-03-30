@@ -51,6 +51,7 @@ const Navbar = () => {
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
             <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
             <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
+            <NavLink to="/my-bookings" className={navLinkClass}>My Bookings</NavLink>
             <Link
               to="/login"
               id="nav-login-btn"
@@ -85,7 +86,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
           }`}
       >
         <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
@@ -93,6 +94,7 @@ const Navbar = () => {
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
           <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
           <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
+          <NavLink to="/my-bookings" className={navLinkClass} id="mobile-nav-my-bookings">My Bookings</NavLink>
           <Link
             to="/login"
             id="mobile-nav-login"
