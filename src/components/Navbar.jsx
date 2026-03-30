@@ -14,8 +14,11 @@ const Navbar = () => {
     setProfileOpen(false)
   }, [location])
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
   }
-
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
