@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import events from '../data/events';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
 import { createBooking } from '../services/bookingService';
+import { eventAPI } from '../services/api';
 
 const BookingPage = () => {
   const { eventId } = useParams();
@@ -11,28 +11,64 @@ const BookingPage = () => {
   const [event, setEvent] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Fetch event data
-    const foundEvent = events.find(e => e.id === parseInt(eventId));
-    if (foundEvent) {
-      setEvent(foundEvent);
-    } else {
-      navigate('/events');
-    }
+    const fetchEvent = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await eventAPI.getEventById(eventId);
+        setEvent(data);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          navigate('/events');
+        } else {
+          setError('Failed to load events');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
   }, [eventId, navigate]);
 
-  if (!event) return <div className="min-h-screen py-20 text-center">Loading...</div>;
+  if (loading) {
+    return <div className="min-h-screen py-20 text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen py-20 text-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen py-20 text-center">
+        <p className="text-gray-500">Event not found</p>
+      </div>
+    );
+  }
+
+  const eventDate = new Date(event.date).toLocaleDateString();
+  const eventTime = event.time ? ` at ${event.time}` : '';
 
   const handleConfirmBooking = async () => {
     setIsBooking(true);
     try {
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const validUserId = user ? (user._id || user.id) : "000000000000000000000000";
+
       const bookingData = {
-        userId: "demoUser",
-        eventId: event.id,
-        ticketQuantity: quantity,
-        totalPrice: event.price * quantity,
-        eventTitle: event.title // passed to success page for display
+        user_id: validUserId,
+        event_id: event._id || event.id,
+        ticket_quantity: quantity
       };
       
       const response = await createBooking(bookingData);
@@ -67,7 +103,7 @@ const BookingPage = () => {
             <div className="text-gray-600 space-y-3">
               <p className="flex items-start md:items-center flex-col md:flex-row gap-1 md:gap-4">
                 <span className="font-semibold w-24 text-gray-800">Date & Time:</span> 
-                <span>{event.date} at {event.time}</span>
+                <span>{eventDate}{eventTime}</span>
               </p>
               <p className="flex items-start md:items-center flex-col md:flex-row gap-1 md:gap-4">
                 <span className="font-semibold w-24 text-gray-800">Location:</span> 

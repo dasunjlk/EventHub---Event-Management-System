@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
-import events from '../data/events'
+import { eventAPI } from '../services/api'
 
 const categoryColors = {
   Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
@@ -15,23 +15,52 @@ const EventDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [currentEvent, setCurrentEvent] = useState(null)
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    setLoading(true)
-    const timer = setTimeout(() => {
-      const found = events.find((e) => e.id === Number(id))
-      setCurrentEvent(found || null)
-      setLoading(false)
-    }, 300)
+    const fetchEventData = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const [event, allEvents] = await Promise.all([
+          eventAPI.getEventById(id),
+          eventAPI.getAllEvents(),
+        ])
 
-    return () => clearTimeout(timer)
+        setCurrentEvent(event)
+        setEvents(allEvents)
+      } catch (err) {
+        if (err.response?.status === 404) {
+          setCurrentEvent(null)
+          setEvents([])
+        } else {
+          console.error('Could not load event:', err)
+          setCurrentEvent(null)
+          setEvents([])
+          setError('Failed to load events')
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEventData()
   }, [id])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
         <p className="text-gray-400">Loading...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
+        <p className="text-red-400">{error}</p>
       </div>
     )
   }
@@ -231,7 +260,7 @@ const EventDetails = () => {
 
               <button
                 id="book-ticket-btn"
-                onClick={() => navigate('/booking')}
+                onClick={() => navigate(`/book/${currentEvent.id}`)}
                 className="btn-accent w-full text-base py-3.5"
               >
                 Book Ticket
