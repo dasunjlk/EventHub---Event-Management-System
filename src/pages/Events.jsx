@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
 import CategoryFilter from '../components/CategoryFilter'
+import { eventAPI } from '../services/api'
 
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
@@ -16,28 +17,23 @@ const Events = () => {
   )
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoading(true)
+      setError('')
       try {
-        setLoading(true);
-        const res = await fetch('http://localhost:5000/api/events');
-        if (!res.ok) throw new Error('Failed to fetch events');
-        const data = await res.json();
-        
-        const formattedData = data.map(ev => ({
-          ...ev,
-          id: ev._id || ev.id,
-          price: ev.ticket_price
-        }));
-        setEvents(formattedData);
+        const data = await eventAPI.getAllEvents()
+        setEvents(data)
       } catch (err) {
-        console.error('Could not load events:', err);
+        console.error('Could not load events:', err)
+        setError('Failed to load events')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchEvents();
+    }
+    fetchEvents()
   }, [])
 
   useEffect(() => {
@@ -91,7 +87,11 @@ const Events = () => {
 
         {loading ? (
           <div className="text-center py-24">
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-gray-400">Loading events...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-24">
+            <p className="text-red-400">{error}</p>
           </div>
         ) : filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
