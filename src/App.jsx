@@ -12,6 +12,7 @@ import BookingSuccess from './pages/BookingSuccess'
 import Dashboard from './pages/Dashboard'
 import ManageEvents from './pages/ManageEvents'
 import Profile from './pages/Profile'
+import MyBookings from './pages/Dashboard/MyBookings'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/manage-events" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
           </Routes>
         </main>
         <Footer />
