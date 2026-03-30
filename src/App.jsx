@@ -11,6 +11,7 @@ import BookingPage from './pages/BookingPage'
 import BookingSuccess from './pages/BookingSuccess'
 import Dashboard from './pages/Dashboard'
 import ManageEvents from './pages/ManageEvents'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/booking-success" element={<BookingSuccess />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/manage-events" element={<ManageEvents />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
         <Footer />
