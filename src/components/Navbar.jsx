@@ -5,8 +5,22 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [user, setUser] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData))
+      } catch (err) {
+        console.error('Error parsing user data', err)
+      }
+    } else {
+      setUser(null)
+    }
+  }, [location])
 
   // Close menus on route change
   useEffect(() => {
@@ -70,7 +84,9 @@ const Navbar = () => {
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
             {localStorage.getItem('token') ? (
               <>
-                <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                {(user?.role === 'admin' || user?.role === 'organizer') && (
+                  <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                )}
                 <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
                 {/* Profile Dropdown */}
                 <div className="relative" id="profile-dropdown-container">
@@ -154,7 +170,9 @@ const Navbar = () => {
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
           {localStorage.getItem('token') ? (
             <>
-              <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              {(user?.role === 'admin' || user?.role === 'organizer') && (
+                <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              )}
               <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
               <NavLink to="/profile" className={(props) => `${navLinkClass(props)} flex items-center gap-3`} id="mobile-nav-profile">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

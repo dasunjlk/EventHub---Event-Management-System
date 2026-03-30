@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ScrollToTop from './components/ScrollToTop'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -15,9 +16,31 @@ import Profile from './pages/Profile'
 import MyBookings from './pages/Dashboard/MyBookings'
 import ProtectedRoute from './components/ProtectedRoute'
 
+import { useEffect } from 'react'
+import { authAPI } from './services/api'
+
 function App() {
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          await authAPI.getProfile()
+        } catch (error) {
+          if (error.response?.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            window.location.href = '/login'
+          }
+        }
+      }
+    }
+    validateToken()
+  }, [])
+
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-1">
