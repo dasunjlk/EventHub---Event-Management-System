@@ -41,6 +41,7 @@ const Home = () => {
   const navigate = useNavigate()
   const [authError, setAuthError] = useState('')
   const [featuredEvents, setFeaturedEvents] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -105,15 +106,25 @@ const Home = () => {
           </p>
 
           {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full">
-            <SearchBar placeholder="Search events, artists, venues..." />
-            <Link to="/events" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (searchQuery.trim()) navigate(`/events?search=${searchQuery.trim()}`)
+            }}
+            className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full"
+          >
+            <SearchBar 
+              placeholder="Search events, artists, venues..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
               Browse Events
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
-          </div>
+            </button>
+          </form> 
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 text-center">
