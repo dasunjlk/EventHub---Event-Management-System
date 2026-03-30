@@ -57,44 +57,44 @@ const BookingPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 min-h-[calc(100vh-140px)]">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      <div className="glass-panel overflow-hidden">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Book Tickets</h1>
-          <p className="text-gray-500 mb-8">Secure your spot for this amazing event</p>
+          <h1 className="text-3xl font-bold text-white drop-shadow-md mb-2">Book Tickets</h1>
+          <p className="text-gray-300 font-medium mb-8">Secure your spot for this amazing event</p>
           
-          <div className="bg-blue-50/50 rounded-lg p-6 mb-8 border border-blue-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h2>
-            <div className="text-gray-600 space-y-3">
+          <div className="glass-panel p-6 mb-8 shadow-inner bg-white/10">
+            <h2 className="text-2xl font-bold text-white mb-4 drop-shadow-sm">{event.title}</h2>
+            <div className="text-gray-200 space-y-3">
               <p className="flex items-start md:items-center flex-col md:flex-row gap-1 md:gap-4">
-                <span className="font-semibold w-24 text-gray-800">Date & Time:</span> 
+                <span className="font-semibold w-24 text-white drop-shadow-sm">Date & Time:</span> 
                 <span>{event.date} at {event.time}</span>
               </p>
               <p className="flex items-start md:items-center flex-col md:flex-row gap-1 md:gap-4">
-                <span className="font-semibold w-24 text-gray-800">Location:</span> 
+                <span className="font-semibold w-24 text-white drop-shadow-sm">Location:</span> 
                 <span>{event.location}</span>
               </p>
             </div>
           </div>
 
           <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Select Tickets</h3>
+            <h3 className="text-lg font-bold text-white mb-4 drop-shadow-sm">Select Tickets</h3>
             <TicketQuantitySelector quantity={quantity} setQuantity={setQuantity} />
           </div>
 
           <BookingSummary price={event.price} quantity={quantity} />
 
-          <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-end mt-8 border-t border-gray-100">
+          <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-end mt-8 border-t border-white/20">
             <button
               onClick={handleCancel}
               disabled={isBooking}
-              className="px-6 py-3 rounded-lg text-gray-600 font-medium hover:bg-gray-100 transition disabled:opacity-50 border border-transparent"
+              className="glass-btn px-6 py-3 min-w-[120px]"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmBooking}
               disabled={isBooking}
-              className="px-8 py-3 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition shadow-md hover:shadow-lg disabled:opacity-75 flex items-center justify-center min-w-[200px]"
+              className="glass-btn px-8 py-3 min-w-[200px]"
             >
               {isBooking ? (
                 <span className="flex items-center gap-2">

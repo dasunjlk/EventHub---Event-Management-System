@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 
 const categoryColors = {
-  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
-  Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
+  Tech: 'glass-badge border-blue-500/30 text-blue-200 bg-blue-500/10 shadow-[0_0_10px_rgba(59,130,246,0.2)]',
+  Art: 'glass-badge border-pink-500/30 text-pink-200 bg-pink-500/10 shadow-[0_0_10px_rgba(236,72,153,0.2)]',
+  Education: 'glass-badge border-green-500/30 text-green-200 bg-green-500/10 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+  Workshop: 'glass-badge border-orange-500/30 text-orange-200 bg-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.2)]'
 }
 
 const EventCard = ({ id, title, date, location, price, image, category }) => {
@@ -15,10 +15,10 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
     year: 'numeric',
   })
 
-  const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
+  const badgeClass = categoryColors[category] || 'glass-badge border-white/20 text-white'
 
   return (
-    <div className="card group flex flex-col hover:scale-[1.01]">
+    <div className="glass-panel group flex flex-col hover:scale-[1.01] !p-0">
       {/* Image */}
       <div className="relative overflow-hidden aspect-[16/9]">
         <img
@@ -33,7 +33,7 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
           {category}
         </span>
         {/* Price Badge */}
-        <span className="badge absolute top-3 right-3 bg-primary-600/90 text-white border border-primary-500/50">
+        <span className="absolute top-3 right-3 bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full px-3 py-1 text-sm font-bold shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
           {price === 0 ? 'Free' : `LKR ${price.toLocaleString()}`}
         </span>
       </div>
@@ -66,7 +66,7 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
           <Link
             to={`/events/${id}`}
             id={`view-event-${id}`}
-            className="btn-primary w-full text-sm py-2.5"
+            className="glass-btn w-full text-sm py-2.5"
           >
             View Details
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

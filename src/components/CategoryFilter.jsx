@@ -12,10 +12,10 @@ export default function CategoryFilter({
         <button
           key={cat}
           onClick={() => handleCategorySelect && handleCategorySelect(cat)}
-          className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 shadow-sm ${
+          className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-300 shadow-sm ${
             selectedCategory === cat
-              ? 'bg-primary-600 border-primary-500 text-white shadow-primary-900/30 scale-[1.02]'
-              : 'bg-gray-800/50 border-gray-700 text-gray-300 hover:bg-gray-800 hover:border-primary-600 hover:text-primary-300 hover:-translate-y-0.5'
+              ? 'bg-white/20 border-white/40 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] scale-[1.02] backdrop-blur-md'
+              : 'bg-white/5 border-white/10 text-gray-300 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 hover:text-white hover:-translate-y-0.5'
           }`}
         >
           {cat === 'All' ? 'All Categories' : cat}
