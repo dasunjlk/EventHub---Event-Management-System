@@ -118,24 +118,24 @@ const ManageEvents = () => {
       <div className="w-full max-w-4xl space-y-8">
         
         {/* Header Section */}
-        <div className="text-center bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-3xl sm:text-4xl font-black text-white">Manage Events</h2>
-          <p className="mt-3 text-lg text-gray-400">View, update, or remove events that you have created.</p>
+        <div className="text-center glass-panel shadow-2xl border-white/20 p-8">
+          <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">Manage Events</h2>
+          <p className="mt-3 text-lg text-gray-200">View, update, or remove events that you have created.</p>
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-900/50 border border-red-800 rounded-xl text-center" role="alert">
+          <div className="glass-panel p-4 text-sm text-red-200 bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)] text-center" role="alert">
             {error}
           </div>
         )}
 
         {!error && events.length === 0 ? (
           /* Empty State */
-          <div className="text-center p-12 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl">
-            <div className="text-5xl mb-4">🗓️</div>
-            <h3 className="text-xl font-bold text-white mb-2">No events available</h3>
-            <p className="text-gray-400 mb-6">You haven't created any events yet.</p>
-            <Link to="/create-event" className="btn-primary inline-block">Create New Event</Link>
+          <div className="text-center p-12 glass-panel shadow-2xl border-white/20">
+            <div className="text-5xl mb-4 drop-shadow-md">🗓️</div>
+            <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No events available</h3>
+            <p className="text-gray-300 mb-6 border-white/20">You haven't created any events yet.</p>
+            <Link to="/create-event" className="glass-btn inline-block">Create New Event</Link>
           </div>
         ) : (
           /* Event List */
@@ -143,7 +143,7 @@ const ManageEvents = () => {
             {events.map((event) => (
               <div 
                 key={event.id} 
-                className="bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-gray-600"
+                className="glass-panel p-6 shadow-2xl transition-all duration-300 hover:border-white/30"
               >
                 {editingId === event.id ? (
                   /* Inline Edit Form */
@@ -172,7 +172,7 @@ const ManageEvents = () => {
                       
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Category *</label>
-                        <select name="category" value={editFormData.category || ''} onChange={handleEditChange} required className="input-field w-full bg-gray-800 text-white">
+                        <select name="category" value={editFormData.category || ''} onChange={handleEditChange} required className="input-field w-full text-white [&>option]:bg-black">
                           <option value="" disabled>Select a category</option>
                           {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
@@ -195,9 +195,9 @@ const ManageEvents = () => {
 
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-800">
-                      <button type="submit" className="flex-1 btn-primary py-2.5 text-sm">Save Changes</button>
-                      <button type="button" onClick={cancelEdit} className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm text-gray-300 bg-gray-800 hover:bg-gray-700 transition duration-300 border border-gray-700">Cancel</button>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/20">
+                      <button type="submit" className="flex-1 glass-btn py-2.5 text-sm">Save Changes</button>
+                      <button type="button" onClick={cancelEdit} className="flex-1 glass-btn text-gray-200 border-white/20 hover:border-white/40">Cancel</button>
                     </div>
                   </form>
                 ) : (
@@ -206,7 +206,7 @@ const ManageEvents = () => {
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <h3 className="text-2xl font-bold text-white">{event.title}</h3>
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary-900/40 text-primary-300 border border-primary-700/40">
+                        <span className="glass-badge">
                           {event.category}
                         </span>
                       </div>
@@ -236,13 +236,13 @@ const ManageEvents = () => {
                     <div className="flex sm:flex-col gap-3 md:min-w-[120px] mt-4 md:mt-0">
                       <button 
                         onClick={() => startEdit(event)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-blue-300 bg-blue-900/30 hover:bg-blue-900/50 border border-blue-800/50 transition duration-300 text-center"
+                        className="flex-1 glass-btn text-white border-white/20 hover:border-white/40 shadow-sm"
                       >
                         Edit
                       </button>
                       <button 
                         onClick={() => handleDelete(event.id)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-red-300 bg-red-900/30 hover:bg-red-900/50 border border-red-800/50 transition duration-300 text-center"
+                        className="flex-1 glass-btn text-white border-red-500/50 hover:bg-red-500/20 shadow-sm"
                       >
                         Delete
                       </button>

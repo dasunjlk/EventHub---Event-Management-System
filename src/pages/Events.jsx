@@ -61,9 +61,9 @@ const Events = () => {
           <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">
             All Events
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-gray-300 text-lg font-medium drop-shadow-sm">
             Showing{' '}
-            <span className="text-primary-400 font-semibold">{filteredEvents.length}</span>{' '}
+            <span className="text-white font-bold drop-shadow-md">{filteredEvents.length}</span>{' '}
             {filteredEvents.length === 1 ? 'event' : 'events'}
             {selectedCategory !== 'All' ? ` in ${selectedCategory}` : ''}
           </p>

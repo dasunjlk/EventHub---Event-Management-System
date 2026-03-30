@@ -83,20 +83,20 @@ const CreateEvent = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
-      <div className="w-full max-w-2xl p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl">
+      <div className="glass-panel w-full max-w-2xl p-8 sm:p-10 space-y-8 shadow-2xl border-white/20">
         <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create New Event</h2>
           <p className="mt-3 text-lg text-gray-400">Host an amazing experience for your audience</p>
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-900/50 border border-red-800 rounded-xl" role="alert">
+          <div className="glass-panel p-4 text-sm text-red-200 bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]" role="alert">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="p-4 text-sm text-green-200 bg-green-900/50 border border-green-800 rounded-xl" role="alert">
+          <div className="glass-panel p-4 text-sm text-green-200 bg-green-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.1)]" role="alert">
             Event created successfully! Redirecting...
           </div>
         )}
@@ -162,7 +162,7 @@ const CreateEvent = () => {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="input-field w-full bg-gray-800 text-white"
+                className="input-field w-full text-white [&>option]:bg-black"
               >
                 <option value="" disabled>Select a category</option>
                 {categories.map((cat) => (
@@ -217,7 +217,7 @@ const CreateEvent = () => {
           <button
             type="submit"
             disabled={!isFormValid() || loading}
-            className="w-full btn-primary py-3 text-base font-bold disabled:opacity-50 disabled:cursor-not-allowed mt-8 transition-opacity duration-200"
+            className="w-full glass-btn py-3 text-base font-bold mt-8 transition-opacity duration-300"
           >
             {loading ? 'Creating Event...' : 'Create Event'}
           </button>

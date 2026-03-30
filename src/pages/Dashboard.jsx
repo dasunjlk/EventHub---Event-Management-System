@@ -62,9 +62,9 @@ const mockBookings = [
 ]
 
 const statusColors = {
-    Confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
-    Pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
-    Cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
+    Confirmed: 'glass-badge border-green-500/30 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+    Pending: 'glass-badge border-yellow-500/30 text-yellow-200 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
+    Cancelled: 'glass-badge border-red-500/30 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.2)]',
 }
 
 export default function Dashboard() {
@@ -96,7 +96,7 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <section className="mb-10">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/40 border border-primary-700/40 text-primary-300 text-sm font-medium mb-5">
+                    <span className="glass-badge mb-5 px-4 py-1.5 shadow-sm">
                         Dashboard Overview
                     </span>
 
@@ -111,19 +111,19 @@ export default function Dashboard() {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
-                            <Link to="/events" className="btn-primary whitespace-nowrap">
+                            <Link to="/events" className="glass-btn whitespace-nowrap shadow-lg">
                                 Browse Events
                             </Link>
                             <div className="relative inline-flex flex-col items-center">
                                 <Link 
                                     to="/manage-events" 
                                     onClick={handleManageEventsClick}
-                                    className="btn-outline whitespace-nowrap shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300"
+                                    className="glass-btn whitespace-nowrap shadow-lg border-white/20 hover:border-white/40 transition-all duration-300"
                                 >
                                     Manage Events
                                 </Link>
                                 {authError && (
-                                    <div className="absolute top-full mt-2 px-3 py-1.5 bg-red-900/90 border border-red-800 text-red-200 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-slide-up z-20">
+                                    <div className="absolute top-full mt-2 px-3 py-1.5 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-xs font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-slide-up z-20">
                                         {authError}
                                     </div>
                                 )}
@@ -134,25 +134,25 @@ export default function Dashboard() {
 
                 {/* Summary Cards */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                    <div className="card p-6">
+                    <div className="glass-panel p-6 shadow-2xl">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Total Bookings</p>
                         <h2 className="text-3xl font-black text-white">{mockBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">All booking records</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-panel p-6 shadow-2xl">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Upcoming Events</p>
                         <h2 className="text-3xl font-black text-white">{upcomingBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">Future event bookings</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-panel p-6 shadow-2xl">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Past Events</p>
                         <h2 className="text-3xl font-black text-white">{pastBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">Completed events</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-panel p-6 shadow-2xl">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Total Spent</p>
                         <h2 className="text-3xl font-black text-white">LKR {totalSpent.toLocaleString()}</h2>
                         <p className="text-sm text-gray-500 mt-2">Excluding cancelled bookings</p>
@@ -187,11 +187,11 @@ export default function Dashboard() {
                             ))}
                         </div>
                     ) : (
-                        <div className="card p-10 text-center">
-                            <div className="text-5xl mb-4">📅</div>
-                            <h3 className="text-xl font-bold text-white mb-2">No upcoming events</h3>
-                            <p className="text-gray-400 mb-6">You have not booked any future events yet.</p>
-                            <Link to="/events" className="btn-primary">
+                        <div className="glass-panel p-10 text-center shadow-2xl">
+                            <div className="text-5xl mb-4 drop-shadow-md">📅</div>
+                            <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No upcoming events</h3>
+                            <p className="text-gray-300 mb-6">You have not booked any future events yet.</p>
+                            <Link to="/events" className="glass-btn shadow-lg">
                                 Explore Events
                             </Link>
                         </div>
@@ -199,7 +199,7 @@ export default function Dashboard() {
                 </section>
 
                 {/* Booking History */}
-                <section className="card p-6 sm:p-8">
+                <section className="glass-panel p-6 sm:p-8 shadow-2xl">
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">Booking History</h2>
@@ -216,7 +216,7 @@ export default function Dashboard() {
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[760px] text-left">
                             <thead>
-                                <tr className="border-b border-gray-800 text-gray-400 text-sm">
+                                <tr className="border-b border-white/20 text-gray-300 text-sm">
                                     <th className="py-4 pr-4 font-semibold">Booking ID</th>
                                     <th className="py-4 pr-4 font-semibold">Event</th>
                                     <th className="py-4 pr-4 font-semibold">Date</th>
@@ -230,10 +230,10 @@ export default function Dashboard() {
                                 {mockBookings.map((booking) => {
                                     const statusClass =
                                         statusColors[booking.status] ||
-                                        'bg-gray-800 text-gray-300 border border-gray-700'
+                                        'glass-badge bg-white/5 border-white/10'
 
                                     return (
-                                        <tr key={booking.id} className="border-b border-gray-900 last:border-b-0">
+                                        <tr key={booking.id} className="border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors">
                                             <td className="py-4 pr-4 text-sm text-gray-300 font-medium">{booking.id}</td>
 
                                             <td className="py-4 pr-4">

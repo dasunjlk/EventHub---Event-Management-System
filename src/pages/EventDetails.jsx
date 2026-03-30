@@ -4,11 +4,11 @@ import EventCard from '../components/EventCard'
 import { eventAPI } from '../services/api'
 
 const categoryColors = {
-  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
-  Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
+  Tech: 'glass-badge border-blue-500/30 text-blue-200 bg-blue-500/10 shadow-[0_0_10px_rgba(59,130,246,0.2)]',
+  Art: 'glass-badge border-pink-500/30 text-pink-200 bg-pink-500/10 shadow-[0_0_10px_rgba(236,72,153,0.2)]',
+  Education: 'glass-badge border-green-500/30 text-green-200 bg-green-500/10 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+  Workshop: 'glass-badge border-orange-500/30 text-orange-200 bg-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.2)]'
 }
 
 const EventDetails = () => {
@@ -73,7 +73,7 @@ const EventDetails = () => {
         <p className="text-gray-400 mb-8 max-w-md">
           The event you're looking for doesn't exist or may have been removed.
         </p>
-        <Link to="/events" className="btn-primary">
+        <Link to="/events" className="glass-btn">
           Back to Events
         </Link>
       </div>
@@ -92,7 +92,7 @@ const EventDetails = () => {
     year: 'numeric',
   })
 
-  const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
+  const badgeClass = categoryColors[category] || 'glass-badge border-white/20 text-white'
 
   const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(location)}`
 
@@ -116,15 +116,15 @@ const EventDetails = () => {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Image */}
-        <div className="relative rounded-3xl overflow-hidden aspect-[21/9] mb-8 shadow-2xl">
+        <div className="relative overflow-hidden glass-panel !padding-0 aspect-[21/9] mb-8 shadow-2xl !p-0 border-white/20">
           <img
             src={image}
             alt={title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-gray-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           {/* Category badge on image */}
-          <span className={`badge absolute top-5 left-5 text-sm px-4 py-1.5 ${badgeClass}`}>
+          <span className={`absolute top-5 left-5 text-sm px-4 py-1.5 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full shadow-lg`}>
             {category}
           </span>
         </div>
@@ -139,9 +139,9 @@ const EventDetails = () => {
             {/* Meta info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
               {/* Date */}
-              <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-                <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start gap-3 glass-panel p-4">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                  <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -153,9 +153,9 @@ const EventDetails = () => {
               </div>
 
               {/* Location */}
-              <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-                <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-start gap-3 glass-panel p-4">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                  <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -168,9 +168,9 @@ const EventDetails = () => {
 
               {/* Organizer */}
               {organizer && (
-                <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-                  <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-start gap-3 glass-panel p-4">
+                  <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                    <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
@@ -183,9 +183,9 @@ const EventDetails = () => {
 
               {/* Seats */}
               {seats && (
-                <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-                  <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-start gap-3 glass-panel p-4">
+                  <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                    <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
@@ -211,7 +211,7 @@ const EventDetails = () => {
               target="_blank"
               rel="noopener noreferrer"
               id="show-map-btn"
-              className="btn-outline inline-flex mb-8"
+              className="glass-btn inline-flex mb-8"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -222,7 +222,7 @@ const EventDetails = () => {
 
           {/* --- Right: Ticket Box --- */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-2xl">
+            <div className="sticky top-24 glass-panel p-6 shadow-2xl">
               <div className="text-center mb-6">
                 <p className="text-gray-400 text-sm mb-1">Price per ticket</p>
                 <p className="text-4xl font-black text-white">
@@ -261,7 +261,7 @@ const EventDetails = () => {
               <button
                 id="book-ticket-btn"
                 onClick={() => navigate(`/book/${currentEvent.id}`)}
-                className="btn-accent w-full text-base py-3.5"
+                className="glass-btn w-full text-base py-3.5"
               >
                 Book Ticket
               </button>
