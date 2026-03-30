@@ -8,13 +8,11 @@ import { eventAPI } from '../services/api'
 const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
 const Events = () => {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const initialCategory = searchParams.get('category') || 'All'
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState(
-    categories.includes(initialCategory) ? initialCategory : 'All'
-  )
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
+  const selectedCategory = searchParams.get('category') || 'All'
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -36,11 +34,29 @@ const Events = () => {
     fetchEvents()
   }, [])
 
+  // Sync search query from URL if it changes externally
   useEffect(() => {
-    if (categories.includes(initialCategory) && selectedCategory !== initialCategory) {
-      setSelectedCategory(initialCategory)
+    const urlSearch = searchParams.get('search') || ''
+    if (urlSearch !== searchQuery) {
+      setSearchQuery(urlSearch)
     }
-  }, [initialCategory, selectedCategory])
+  }, [searchParams])
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value
+    setSearchQuery(val)
+    const newParams = new URLSearchParams(searchParams)
+    if (val) newParams.set('search', val)
+    else newParams.delete('search')
+    setSearchParams(newParams, { replace: true })
+  }
+
+  const handleCategoryChange = (cat) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (cat === 'All') newParams.delete('category')
+    else newParams.set('category', cat)
+    setSearchParams(newParams)
+  }
 
   const filteredEvents = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase()
@@ -72,7 +88,7 @@ const Events = () => {
         <div className="mb-6">
           <SearchBar
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search events by title..."
           />
         </div>
@@ -81,7 +97,7 @@ const Events = () => {
           <CategoryFilter
             categories={categories}
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            setSelectedCategory={handleCategoryChange}
           />
         </div>
 

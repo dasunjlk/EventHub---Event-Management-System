@@ -41,6 +41,7 @@ const Home = () => {
   const navigate = useNavigate()
   const [authError, setAuthError] = useState('')
   const [featuredEvents, setFeaturedEvents] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -49,7 +50,7 @@ const Home = () => {
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         
-        const formattedData = data.map(ev => ({
+        const formattedData = (data || []).filter(ev => ev !== null).map(ev => ({
           ...ev,
           id: ev._id || ev.id,
           price: ev.ticket_price
@@ -90,13 +91,13 @@ const Home = () => {
           </span>
 
           {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-md">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-2xl">
             Discover{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 drop-shadow-sm">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 animate-gradient-x">
               Amazing Events
             </span>
             <br />
-            Near You
+            <span className="text-gray-200">Near You</span>
           </h1>
 
           {/* Subtext */}
@@ -105,15 +106,25 @@ const Home = () => {
           </p>
 
           {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full">
-            <SearchBar placeholder="Search events, artists, venues..." />
-            <Link to="/events" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (searchQuery.trim()) navigate(`/events?search=${searchQuery.trim()}`)
+            }}
+            className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full"
+          >
+            <SearchBar 
+              placeholder="Search events, artists, venues..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
               Browse Events
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
-          </div>
+            </button>
+          </form> 
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 text-center">
