@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 
 const categoryColors = {
-  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
-  Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Music: 'bg-pink-500/20 text-pink-300 border-pink-400/50',
+  Tech: 'bg-blue-500/20 text-blue-300 border-blue-400/50',
+  Art: 'bg-purple-500/20 text-purple-300 border-purple-400/50',
+  Education: 'bg-green-500/20 text-green-300 border-green-400/50',
+  Workshop: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
 }
 
 const EventCard = ({ id, title, date, location, price, image, category }) => {
@@ -15,10 +15,10 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
     year: 'numeric',
   })
 
-  const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
+  const badgeClass = categoryColors[category] || 'bg-white/10 text-gray-200 border border-white/20 backdrop-blur-md'
 
   return (
-    <div className="card group flex flex-col hover:scale-[1.01]">
+    <div className="glass-card group flex flex-col hover:scale-[1.01]">
       {/* Image */}
       <div className="relative overflow-hidden aspect-[16/9]">
         <img
@@ -33,7 +33,7 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
           {category}
         </span>
         {/* Price Badge */}
-        <span className="badge absolute top-3 right-3 bg-primary-600/90 text-white border border-primary-500/50">
+        <span className="badge absolute top-3 right-3 !bg-primary-500/40 !text-white !border-primary-400/60 shadow-[0_2px_10px_rgba(79,99,241,0.3)]">
           {price === 0 ? 'Free' : `LKR ${price.toLocaleString()}`}
         </span>
       </div>

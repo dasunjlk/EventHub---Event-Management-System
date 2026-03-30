@@ -27,7 +27,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || menuOpen
-          ? 'bg-gray-950/95 backdrop-blur-md border-b border-gray-800 shadow-lg'
+          ? 'bg-black/40 backdrop-blur-2xl border-b border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
           : 'bg-transparent'
         }`}
     >
@@ -90,7 +90,7 @@ const Navbar = () => {
         className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
           }`}
       >
-        <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
+        <div className="px-4 pb-4 flex flex-col gap-3 bg-black/60 backdrop-blur-2xl border-t border-white/20 shadow-xl text-gray-100">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
           {localStorage.getItem('token') && (

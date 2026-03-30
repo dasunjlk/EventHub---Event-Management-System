@@ -117,7 +117,7 @@ const ManageEvents = () => {
       <div className="w-full max-w-4xl space-y-8">
         
         {/* Header Section */}
-        <div className="text-center bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
+        <div className="glass-panel text-center p-8">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Manage Events</h2>
           <p className="mt-3 text-lg text-gray-400">View, update, or remove events that you have created.</p>
         </div>
@@ -130,7 +130,7 @@ const ManageEvents = () => {
 
         {!error && events.length === 0 ? (
           /* Empty State */
-          <div className="text-center p-12 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl">
+          <div className="glass-panel text-center p-12">
             <div className="text-5xl mb-4">🗓️</div>
             <h3 className="text-xl font-bold text-white mb-2">No events available</h3>
             <p className="text-gray-400 mb-6">You haven't created any events yet.</p>
@@ -142,7 +142,7 @@ const ManageEvents = () => {
             {events.map((event) => (
               <div 
                 key={event.id} 
-                className="bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-gray-600"
+                className="glass-card p-6"
               >
                 {editingId === event.id ? (
                   /* Inline Edit Form */
@@ -194,9 +194,9 @@ const ManageEvents = () => {
 
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-800">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/10">
                       <button type="submit" className="flex-1 btn-primary py-2.5 text-sm">Save Changes</button>
-                      <button type="button" onClick={cancelEdit} className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm text-gray-300 bg-gray-800 hover:bg-gray-700 transition duration-300 border border-gray-700">Cancel</button>
+                      <button type="button" onClick={cancelEdit} className="flex-1 btn-outline py-2.5 text-sm">Cancel</button>
                     </div>
                   </form>
                 ) : (

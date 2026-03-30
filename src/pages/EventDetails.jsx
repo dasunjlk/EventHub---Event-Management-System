@@ -4,11 +4,11 @@ import EventCard from '../components/EventCard'
 import events from '../data/events'
 
 const categoryColors = {
-  Music: 'bg-pink-900/60 text-pink-300 border border-pink-800',
-  Tech: 'bg-blue-900/60 text-blue-300 border border-blue-800',
-  Art: 'bg-purple-900/60 text-purple-300 border border-purple-800',
-  Education: 'bg-green-900/60 text-green-300 border border-green-800',
-  Workshop: 'bg-amber-900/60 text-amber-300 border border-amber-800',
+  Music: 'bg-pink-500/20 text-pink-300 border-pink-400/50',
+  Tech: 'bg-blue-500/20 text-blue-300 border-blue-400/50',
+  Art: 'bg-purple-500/20 text-purple-300 border-purple-400/50',
+  Education: 'bg-green-500/20 text-green-300 border-green-400/50',
+  Workshop: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
 }
 
 const EventDetails = () => {
@@ -63,7 +63,7 @@ const EventDetails = () => {
     year: 'numeric',
   })
 
-  const badgeClass = categoryColors[category] || 'bg-gray-800 text-gray-300 border border-gray-700'
+  const badgeClass = categoryColors[category] || 'bg-white/10 text-gray-200 border border-white/20 backdrop-blur-md'
 
   const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(location)}`
 
@@ -110,7 +110,7 @@ const EventDetails = () => {
             {/* Meta info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
               {/* Date */}
-              <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
+              <div className="flex items-start gap-3 glass-card p-4">
                 <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                   <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -124,7 +124,7 @@ const EventDetails = () => {
               </div>
 
               {/* Location */}
-              <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
+              <div className="flex items-start gap-3 glass-card p-4">
                 <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                   <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -139,7 +139,7 @@ const EventDetails = () => {
 
               {/* Organizer */}
               {organizer && (
-                <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
+                <div className="flex items-start gap-3 glass-card p-4">
                   <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -154,7 +154,7 @@ const EventDetails = () => {
 
               {/* Seats */}
               {seats && (
-                <div className="flex items-start gap-3 p-4 bg-gray-900 rounded-2xl border border-gray-800">
+                <div className="flex items-start gap-3 glass-card p-4">
                   <div className="w-10 h-10 bg-primary-900/60 border border-primary-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -193,8 +193,9 @@ const EventDetails = () => {
 
           {/* --- Right: Ticket Box --- */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-2xl">
-              <div className="text-center mb-6">
+            <div className="sticky top-24 glass-panel p-6 text-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-transparent to-accent-600/10 pointer-events-none" />
+              <div className="relative z-10 text-center mb-6">
                 <p className="text-gray-400 text-sm mb-1">Price per ticket</p>
                 <p className="text-4xl font-black text-white">
                   {price === 0 ? (
@@ -208,7 +209,7 @@ const EventDetails = () => {
                 </p>
               </div>
 
-              <div className="space-y-3 mb-6 text-sm text-gray-400">
+              <div className="relative z-10 space-y-3 mb-6 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -232,12 +233,12 @@ const EventDetails = () => {
               <button
                 id="book-ticket-btn"
                 onClick={() => navigate(`/book/${currentEvent.id}`)}
-                className="btn-accent w-full text-base py-3.5"
+                className="relative z-10 btn-accent w-full text-base py-3.5"
               >
                 Book Ticket
               </button>
 
-              <p className="text-center text-gray-600 text-xs mt-4">
+              <p className="relative z-10 text-center text-gray-500 text-xs mt-4">
                 No action performed - UI only
               </p>
             </div>

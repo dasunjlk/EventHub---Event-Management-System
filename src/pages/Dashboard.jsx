@@ -62,9 +62,9 @@ const mockBookings = [
 ]
 
 const statusColors = {
-    Confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
-    Pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
-    Cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
+    Confirmed: 'bg-green-500/20 text-green-300 border border-green-400/50 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]',
+    Pending: 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/50 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]',
+    Cancelled: 'bg-red-500/20 text-red-300 border border-red-400/50 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]',
 }
 
 export default function Dashboard() {
@@ -96,7 +96,7 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <section className="mb-10">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/40 border border-primary-700/40 text-primary-300 text-sm font-medium mb-5">
+                    <span className="badge px-4 py-1.5 mb-5 items-center gap-2">
                         Dashboard Overview
                     </span>
 
@@ -134,25 +134,25 @@ export default function Dashboard() {
 
                 {/* Summary Cards */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                    <div className="card p-6">
+                    <div className="glass-card p-6">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Total Bookings</p>
                         <h2 className="text-3xl font-black text-white">{mockBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">All booking records</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-card p-6">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Upcoming Events</p>
                         <h2 className="text-3xl font-black text-white">{upcomingBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">Future event bookings</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-card p-6">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Past Events</p>
                         <h2 className="text-3xl font-black text-white">{pastBookings.length}</h2>
                         <p className="text-sm text-gray-500 mt-2">Completed events</p>
                     </div>
 
-                    <div className="card p-6">
+                    <div className="glass-card p-6">
                         <p className="text-sm font-semibold text-gray-400 mb-3">Total Spent</p>
                         <h2 className="text-3xl font-black text-white">LKR {totalSpent.toLocaleString()}</h2>
                         <p className="text-sm text-gray-500 mt-2">Excluding cancelled bookings</p>
@@ -187,7 +187,7 @@ export default function Dashboard() {
                             ))}
                         </div>
                     ) : (
-                        <div className="card p-10 text-center">
+                        <div className="glass-panel p-10 text-center">
                             <div className="text-5xl mb-4">📅</div>
                             <h3 className="text-xl font-bold text-white mb-2">No upcoming events</h3>
                             <p className="text-gray-400 mb-6">You have not booked any future events yet.</p>
@@ -199,7 +199,7 @@ export default function Dashboard() {
                 </section>
 
                 {/* Booking History */}
-                <section className="card p-6 sm:p-8">
+                <section className="glass-panel p-6 sm:p-8">
                     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">Booking History</h2>
@@ -211,7 +211,7 @@ export default function Dashboard() {
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[760px] text-left">
                             <thead>
-                                <tr className="border-b border-gray-800 text-gray-400 text-sm">
+                                <tr className="border-b border-white/10 text-gray-400 text-sm">
                                     <th className="py-4 pr-4 font-semibold">Booking ID</th>
                                     <th className="py-4 pr-4 font-semibold">Event</th>
                                     <th className="py-4 pr-4 font-semibold">Date</th>
@@ -228,7 +228,7 @@ export default function Dashboard() {
                                         'bg-gray-800 text-gray-300 border border-gray-700'
 
                                     return (
-                                        <tr key={booking.id} className="border-b border-gray-900 last:border-b-0">
+                                        <tr key={booking.id} className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors duration-200">
                                             <td className="py-4 pr-4 text-sm text-gray-300 font-medium">{booking.id}</td>
 
                                             <td className="py-4 pr-4">

@@ -15,23 +15,35 @@ import ManageEvents from './pages/ManageEvents'
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/events/:id" element={<EventDetails />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/create-event" element={<CreateEvent />} />
-            <Route path="/book/:eventId" element={<BookingPage />} />
-            <Route path="/booking-success" element={<BookingSuccess />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/manage-events" element={<ManageEvents />} />
-          </Routes>
-        </main>
-        <Footer />
+      <div className="flex flex-col min-h-screen relative overflow-hidden text-gray-100">
+        {/* Abstract High-Quality Wallpaper for Glass Refraction */}
+        <div className="fixed inset-0 z-[-1] bg-[#050510]">
+          <img 
+            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
+            alt="ambient fluid background"
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/80 via-transparent to-[#050510]/90"></div>
+        </div>
+        
+        <div className="relative z-10 flex flex-col min-h-screen w-full">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/events/:id" element={<EventDetails />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/create-event" element={<CreateEvent />} />
+              <Route path="/book/:eventId" element={<BookingPage />} />
+              <Route path="/booking-success" element={<BookingSuccess />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/manage-events" element={<ManageEvents />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
       </div>
     </BrowserRouter>
   )

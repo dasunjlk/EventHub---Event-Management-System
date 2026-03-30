@@ -30,8 +30,10 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen pt-24 pb-20 px-4">
-      <div className="w-full max-w-md p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-blue-500 rounded-2xl shadow-2xl">
-        <div className="text-center">
+      <div className="w-full max-w-md p-8 sm:p-10 space-y-8 glass-panel group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-accent-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="relative z-10 space-y-8">
+          <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create Account</h2>
           <p className="mt-3 text-lg text-gray-400">Join EventHub today</p>
         </div>
@@ -103,7 +105,7 @@ const Register = () => {
         <button
           type="button"
           onClick={() => { /* Mock Google Sign-In */ }}
-          className="w-full flex items-center justify-center gap-3 px-5 py-3 text-base font-semibold text-white transition-colors bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-700"
+          className="w-full flex items-center justify-center gap-3 px-5 py-3 text-base font-semibold text-white transition-all bg-white/10 border border-white/20 backdrop-blur-md hover:bg-white/20 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -132,6 +134,7 @@ const Register = () => {
             Sign in
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );

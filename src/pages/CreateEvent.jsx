@@ -83,8 +83,10 @@ const CreateEvent = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
-      <div className="w-full max-w-2xl p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-2xl">
-        <div className="text-center">
+      <div className="w-full max-w-2xl p-8 sm:p-10 space-y-8 glass-panel group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-accent-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="relative z-10 space-y-8">
+          <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create New Event</h2>
           <p className="mt-3 text-lg text-gray-400">Host an amazing experience for your audience</p>
         </div>
@@ -162,7 +164,7 @@ const CreateEvent = () => {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="input-field w-full bg-gray-800 text-white"
+                className="input-field w-full appearance-none bg-black/40 text-white"
               >
                 <option value="" disabled>Select a category</option>
                 {categories.map((cat) => (
@@ -222,6 +224,7 @@ const CreateEvent = () => {
             {loading ? 'Creating Event...' : 'Create Event'}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );

@@ -56,7 +56,7 @@ const Home = () => {
       {/* ── Hero Section ── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950/50 to-gray-950" />
+        <div className="absolute inset-0 bg-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/20 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent-600/10 via-transparent to-transparent" />
 
@@ -66,7 +66,7 @@ const Home = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 animate-slide-up">
           {/* Badge */}
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/60 border border-primary-700/50 text-primary-300 text-sm font-medium mb-8">
+          <span className="badge !bg-primary-900/40 !border-primary-500/50 !text-primary-300 px-4 py-1.5 mb-8">
             <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
             10,000+ events listed across Sri Lanka
           </span>
@@ -113,7 +113,7 @@ const Home = () => {
         </div>
 
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0b0c10] to-transparent pointer-events-none" />
       </section>
 
       {/* ── Categories Section ── */}
@@ -166,8 +166,8 @@ const Home = () => {
 
       {/* ── Host Event CTA ── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-10">
-        <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-3xl p-10 sm:p-14 shadow-2xl relative overflow-hidden group text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/10 via-transparent to-accent-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="glass-panel p-10 sm:p-14 group text-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-transparent to-accent-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">Want to host an event?</h2>
             <p className="text-gray-400 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
@@ -192,19 +192,19 @@ const Home = () => {
       </section>
 
       {/* ── CTA Banner ── */}
-      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-3xl overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-500" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-accent-500/30 via-transparent to-transparent" />
-        <div className="relative px-8 py-14 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 glass-panel !border-primary-500/50 !shadow-[0_8px_32px_rgba(79,99,241,0.4)] relative">
+        <div className="absolute inset-0 bg-primary-600/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/50 to-accent-500/50 mix-blend-overlay" />
+        <div className="relative z-10 px-8 py-14 text-center">
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 drop-shadow-md">
             Ready to experience something amazing?
           </h2>
-          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto drop-shadow-sm">
             Join thousands of people discovering great events every day.
           </p>
-          <Link to="/events" id="cta-browse-btn" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-700 font-bold rounded-xl hover:bg-primary-50 transition-all duration-200 hover:-translate-y-0.5 shadow-xl">
+          <Link to="/events" id="cta-browse-btn" className="glass-button px-8 py-3.5 text-lg border-white/40">
             Explore All Events
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
