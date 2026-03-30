@@ -1,9 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
 import CategoryFilter from '../components/CategoryFilter'
-import events from '../data/events'
 
 const categories = [
   {
@@ -38,11 +37,30 @@ const categories = [
   },
 ]
 
-const featuredEvents = events.slice(0, 6)
-
 const Home = () => {
   const navigate = useNavigate()
   const [authError, setAuthError] = useState('')
+  const [featuredEvents, setFeaturedEvents] = useState([])
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/events');
+        if (!res.ok) throw new Error('Failed to fetch events');
+        const data = await res.json();
+        
+        const formattedData = data.map(ev => ({
+          ...ev,
+          id: ev._id || ev.id,
+          price: ev.ticket_price
+        }));
+        setFeaturedEvents(formattedData.slice(0, 6));
+      } catch (err) {
+        console.error('Could not load featured events:', err);
+      }
+    };
+    fetchEvents();
+  }, [])
 
   const handleCreateEventClick = (e) => {
     if (!localStorage.getItem('token')) {

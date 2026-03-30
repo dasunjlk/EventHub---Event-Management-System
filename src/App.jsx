@@ -12,6 +12,7 @@ import BookingSuccess from './pages/BookingSuccess'
 import Dashboard from './pages/Dashboard'
 import ManageEvents from './pages/ManageEvents'
 import Profile from './pages/Profile'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -25,12 +26,12 @@ function App() {
             <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/create-event" element={<CreateEvent />} />
-            <Route path="/book/:eventId" element={<BookingPage />} />
-            <Route path="/booking-success" element={<BookingSuccess />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/manage-events" element={<ManageEvents />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+            <Route path="/book/:eventId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
+            <Route path="/booking-success" element={<ProtectedRoute><BookingSuccess /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/manage-events" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Routes>
         </main>
         <Footer />

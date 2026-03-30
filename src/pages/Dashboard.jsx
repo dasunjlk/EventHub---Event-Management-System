@@ -205,7 +205,12 @@ export default function Dashboard() {
                             <h2 className="text-2xl font-bold text-white mb-1">Booking History</h2>
                             <p className="text-gray-400 text-sm">Your current and past bookings</p>
                         </div>
-                        <span className="text-gray-500 text-sm">{mockBookings.length} total records</span>
+                        <div className="flex items-center gap-4">
+                            <span className="text-gray-500 text-sm">{mockBookings.length} total records</span>
+                            <Link to="/my-bookings" className="text-primary-400 hover:text-primary-300 text-sm font-semibold">
+                                View full history
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">

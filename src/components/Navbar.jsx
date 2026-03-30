@@ -6,11 +6,19 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   // Close menus on route change
   useEffect(() => {
     setMenuOpen(false)
     setProfileOpen(false)
+  }, [location])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
   }, [location])
 
   // Close profile dropdown when clicking outside
@@ -23,13 +31,6 @@ const Navbar = () => {
     window.addEventListener('click', handleClickOutside)
     return () => window.removeEventListener('click', handleClickOutside)
   }, [profileOpen])
-
-  const navigate = useNavigate()
-  
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
-  }
 
   // Add background on scroll
   useEffect(() => {
@@ -73,12 +74,12 @@ const Navbar = () => {
               <>
                 <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
                 <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
-                
                 {/* Profile Dropdown */}
                 <div className="relative" id="profile-dropdown-container">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center justify-center w-10 h-10 glass-panel !p-0 !rounded-full hover:bg-white/20 transition-all duration-300"
+                    title="Profile Menu"
                   >
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -86,9 +87,10 @@ const Navbar = () => {
                   </button>
 
                   {profileOpen && (
-                    <div className="absolute right-0 mt-3 w-48 glass-panel !p-2 flex flex-col gap-1 shadow-2xl animate-fadeIn">
+                    <div className="absolute right-0 mt-3 w-48 glass-panel !p-2 flex flex-col gap-1 shadow-2xl animate-fadeIn z-50">
                       <Link
                         to="/profile"
+                        onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,6 +107,10 @@ const Navbar = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
                         Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
                       </button>
                     </div>
                   )}

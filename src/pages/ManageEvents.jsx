@@ -90,7 +90,8 @@ const ManageEvents = () => {
       });
       
       if (!res.ok) throw new Error('Failed to update event');
-      const updatedEvent = await res.json();
+      const responseData = await res.json();
+      const updatedEvent = responseData.event || responseData;
       
       const formattedUpdatedEvent = {
         ...updatedEvent,

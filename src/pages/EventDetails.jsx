@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
-import events from '../data/events'
+import { eventAPI } from '../services/api'
 
 const categoryColors = {
   Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
@@ -15,23 +15,52 @@ const EventDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [currentEvent, setCurrentEvent] = useState(null)
+  const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    setLoading(true)
-    const timer = setTimeout(() => {
-      const found = events.find((e) => e.id === Number(id))
-      setCurrentEvent(found || null)
-      setLoading(false)
-    }, 300)
+    const fetchEventData = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const [event, allEvents] = await Promise.all([
+          eventAPI.getEventById(id),
+          eventAPI.getAllEvents(),
+        ])
 
-    return () => clearTimeout(timer)
+        setCurrentEvent(event)
+        setEvents(allEvents)
+      } catch (err) {
+        if (err.response?.status === 404) {
+          setCurrentEvent(null)
+          setEvents([])
+        } else {
+          console.error('Could not load event:', err)
+          setCurrentEvent(null)
+          setEvents([])
+          setError('Failed to load events')
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEventData()
   }, [id])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
         <p className="text-gray-400">Loading...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
+        <p className="text-red-400">{error}</p>
       </div>
     )
   }

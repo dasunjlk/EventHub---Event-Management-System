@@ -1,19 +1,21 @@
 import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
-  userId: {
-    type: String,
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  eventId: {
-    type: String,
+  event_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
     required: true
   },
-  ticketQuantity: {
+  ticket_quantity: {
     type: Number,
     required: true
   },
-  totalPrice: {
+  total_price: {
     type: Number,
     required: true
   },
@@ -26,7 +28,7 @@ const bookingSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  bookingDate: {
+  booking_date: {
     type: Date,
     default: Date.now
   }
