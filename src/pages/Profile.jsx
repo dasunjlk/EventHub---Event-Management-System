@@ -12,7 +12,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             try {
                 const response = await authAPI.getProfile();
-                setUser(response.data.user);
+                setUser(response.data);
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to fetch profile');
                 if (err.response && err.response.status === 401) {

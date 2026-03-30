@@ -85,19 +85,18 @@ export const loginUser = async (req, res) => {
 // @access  Private
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-
-    if (user) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized' });
     }
+
+    res.json({
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    });
   } catch (error) {
+    console.error('Profile Controller Error:', error);
     res.status(500).json({ message: error.message || 'Server Error' });
   }
 };
