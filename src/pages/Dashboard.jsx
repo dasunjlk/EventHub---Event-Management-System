@@ -69,7 +69,17 @@ const statusColors = {
 
 export default function Dashboard() {
     const [authError, setAuthError] = useState('')
+    const [userRole, setUserRole] = useState('')
     const today = new Date()
+
+    React.useEffect(() => {
+        const userData = localStorage.getItem('user')
+        if (userData) {
+            try {
+                setUserRole(JSON.parse(userData).role)
+            } catch (err) {}
+        }
+    }, [])
 
     const handleManageEventsClick = (e) => {
         if (!localStorage.getItem('token')) {
@@ -114,20 +124,22 @@ export default function Dashboard() {
                             <Link to="/events" className="glass-btn whitespace-nowrap shadow-lg">
                                 Browse Events
                             </Link>
-                            <div className="relative inline-flex flex-col items-center">
-                                <Link 
-                                    to="/manage-events" 
-                                    onClick={handleManageEventsClick}
-                                    className="glass-btn whitespace-nowrap shadow-lg border-white/20 hover:border-white/40 transition-all duration-300"
-                                >
-                                    Manage Events
-                                </Link>
-                                {authError && (
-                                    <div className="absolute top-full mt-2 px-3 py-1.5 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-xs font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-slide-up z-20">
-                                        {authError}
-                                    </div>
-                                )}
-                            </div>
+                            {(userRole === 'organizer' || userRole === 'admin') && (
+                                <div className="relative inline-flex flex-col items-center">
+                                    <Link 
+                                        to="/manage-events" 
+                                        onClick={handleManageEventsClick}
+                                        className="glass-btn whitespace-nowrap shadow-lg border-white/20 hover:border-white/40 transition-all duration-300"
+                                    >
+                                        Manage Events
+                                    </Link>
+                                    {authError && (
+                                        <div className="absolute top-full mt-2 px-3 py-1.5 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-xs font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-slide-up z-20">
+                                            {authError}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

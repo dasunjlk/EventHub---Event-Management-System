@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import eventService from '../services/eventService';
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -18,9 +19,8 @@ const ManageEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/events');
-      if (!res.ok) throw new Error('Failed to fetch events');
-      const data = await res.json();
+      const res = await eventService.getMyEvents();
+      const data = res.data || res;
 
       const formattedData = data.map(ev => ({
         ...ev,
@@ -29,7 +29,7 @@ const ManageEvents = () => {
       setEvents(formattedData);
       setError(null);
     } catch (err) {
-      setError('Could not load events. Please ensure the backend is running.');
+      setError(err.message || 'Could not load events. Please ensure the backend is running.');
     } finally {
       setLoading(false);
     }
@@ -38,10 +38,7 @@ const ManageEvents = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${id}`, {
-          method: 'DELETE'
-        });
-        if (!res.ok) throw new Error('Failed to delete event');
+        await eventService.deleteEvent(id);
         setEvents(events.filter(event => event.id !== id));
       } catch (err) {
         alert(err.message);
@@ -81,17 +78,8 @@ const ManageEvents = () => {
         available_tickets: Number(editFormData.available_tickets)
       };
 
-      const res = await fetch(`http://localhost:5000/api/events/${editingId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Failed to update event');
-      const responseData = await res.json();
-      const updatedEvent = responseData.event || responseData;
+      const res = await eventService.updateEvent(editingId, payload);
+      const updatedEvent = res.data || res.event || res;
 
       const formattedUpdatedEvent = {
         ...updatedEvent,

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'user' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -80,6 +80,14 @@ const Register = () => {
               className="input-field w-full"
               placeholder="name@company.com"
             />
+          </div>
+
+          <div>
+             <label className="block text-sm font-semibold text-gray-300 mb-2">Account Type</label>
+             <select name="role" value={formData.role} onChange={handleChange} className="input-field w-full text-white [&>option]:bg-black">
+                <option value="user">Attendee (Book Events)</option>
+                <option value="organizer">Organizer (Host Events)</option>
+             </select>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
