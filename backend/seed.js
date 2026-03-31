@@ -98,13 +98,20 @@ const seedDB = async () => {
     await User.deleteMany({});
     console.log('Cleared existing events and users');
 
-    await Event.insertMany(events);
-    await User.create({
+    const testUser = await User.create({
       name: 'Test Administrator',
       email: 'test@example.com',
       password: 'password123',
       role: 'admin'
     });
+
+    // Inject the test user ID into all dummy events to satisfy the 'createdBy' schema requirement
+    const eventsWithCreator = events.map(e => ({
+      ...e,
+      createdBy: testUser._id
+    }));
+
+    await Event.insertMany(eventsWithCreator);
     console.log('Database seeded with 8 dummy events and 1 test user!');
     
     process.exit(0);

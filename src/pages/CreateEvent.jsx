@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import eventService from '../services/eventService';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -46,17 +47,7 @@ const CreateEvent = () => {
         available_tickets: Number(formData.available_tickets)
       };
 
-      const response = await fetch('http://localhost:5000/api/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create event. Please try again.');
-      }
+      await eventService.createEvent(payload);
 
       setSuccess(true);
       setFormData({
