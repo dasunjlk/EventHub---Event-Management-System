@@ -20,21 +20,28 @@
 @layer components {
   /* LIQUID GLASS SYSTEM */
   .glass-panel {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 relative overflow-hidden;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-500 relative overflow-hidden;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+    will-change: transform, opacity;
   }
   
   .glass-panel:hover {
-    @apply bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+    @apply bg-white/10 border-white/20 shadow-[0_12px_40px_rgba(0,0,0,0.4)] scale-[1.02];
   }
 
   .glass-btn {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-2xl backdrop-blur-md border border-white/20 transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.2);
+    will-change: transform, box-shadow;
   }
   
   .glass-btn:hover {
+    @apply scale-[1.05] shadow-[0_8px_25px_rgba(255,255,255,0.1)];
     box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.3);
+  }
+
+  .glass-btn:active {
+    @apply scale-95;
   }
 
   .glass-input {
@@ -72,6 +79,88 @@
   }
 }
 
+/* IMAGE POLISH */
+img {
+  @apply transition-all duration-700 ease-out;
+}
+
+.card img, .event-card img, .glass-panel img {
+  @apply hover:scale-110 hover:brightness-110;
+}
+
+/* SCROLL REVEAL SYSTEM */
+.reveal-on-scroll:not(.is-visible) {
+  opacity: 0 !important;
+  transform: translateY(30px) !important;
+  pointer-events: none;
+}
+
+.reveal-on-scroll {
+  /* Apple/Samsung style easing: cubic-bezier(0.23, 1, 0.32, 1) */
+  transition: opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1), transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* PREMIUM CARD & BUTTON POLISH */
+.glass-panel, .card, .event-card, [class*="card"] {
+  @apply transition-all duration-500;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.glass-panel:hover, .card:hover, .event-card:hover, [class*="card"]:hover {
+  @apply scale-[1.03] -translate-y-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)];
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Specific rim light effect for glass panels */
+.glass-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: skewX(-25deg);
+  transition: 0.75s;
+}
+
+.glass-panel:hover::after {
+  left: 150%;
+}
+
+.glass-btn:active {
+  @apply scale-90 brightness-110;
+  transition-duration: 0.1s;
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: none !important;
+  }
+  
+  .glass-panel:hover, .glass-btn:hover, img:hover {
+    transform: none !important;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -100,4 +189,4 @@
 .animate-gradient-x {
   background-size: 200% 200%;
   animation: gradient-x 15s ease infinite;
-}
+}
