@@ -38,11 +38,13 @@ export const authAPI = {
 export const eventAPI = {
   getAllEvents: async () => {
     const res = await api.get('/events');
-    return res.data.map(mapEvent);
+    const data = Array.isArray(res.data) ? res.data : (res.data.data || []);
+    return data.map(mapEvent);
   },
   getEventById: async (id) => {
     const res = await api.get(`/events/${id}`);
-    return mapEvent(res.data);
+    const data = res.data.event || res.data.data || res.data;
+    return mapEvent(data);
   },
   createEvent: async (eventData) => {
     const res = await api.post('/events', {

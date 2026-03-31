@@ -6,11 +6,12 @@ export const createEvent = async (req, res) => {
     const newEvent = new Event(req.body);
     const savedEvent = await newEvent.save();
     res.status(201).json({
+      success: true,
       message: 'Event created successfully',
-      event: savedEvent
+      data: savedEvent
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating event', error: error.message });
+    res.status(500).json({ success: false, message: 'Error creating event', error: error.message });
   }
 };
 
@@ -18,9 +19,13 @@ export const createEvent = async (req, res) => {
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find();
-    res.status(200).json(events);
+    res.status(200).json({
+      success: true,
+      message: 'Events retrieved successfully',
+      data: events
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching events', error: error.message });
+    res.status(500).json({ success: false, message: 'Error fetching events', error: error.message });
   }
 };
 
@@ -29,11 +34,15 @@ export const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ success: false, message: 'Event not found' });
     }
-    res.status(200).json(event);
+    res.status(200).json({
+      success: true,
+      message: 'Event retrieved successfully',
+      data: event
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching event', error: error.message });
+    res.status(500).json({ success: false, message: 'Error fetching event', error: error.message });
   }
 };
 
@@ -46,14 +55,15 @@ export const updateEvent = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!updatedEvent) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ success: false, message: 'Event not found' });
     }
     res.status(200).json({
+      success: true,
       message: 'Event updated successfully',
-      event: updatedEvent
+      data: updatedEvent
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating event', error: error.message });
+    res.status(500).json({ success: false, message: 'Error updating event', error: error.message });
   }
 };
 
@@ -62,10 +72,10 @@ export const deleteEvent = async (req, res) => {
   try {
     const deletedEvent = await Event.findByIdAndDelete(req.params.id);
     if (!deletedEvent) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ success: false, message: 'Event not found' });
     }
-    res.status(200).json({ message: 'Event deleted successfully' });
+    res.status(200).json({ success: true, message: 'Event deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting event', error: error.message });
+    res.status(500).json({ success: false, message: 'Error deleting event', error: error.message });
   }
 };

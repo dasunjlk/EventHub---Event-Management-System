@@ -50,7 +50,8 @@ const Home = () => {
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         
-        const formattedData = (data || []).filter(ev => ev !== null).map(ev => ({
+        const eventsArray = Array.isArray(data) ? data : (data.data || []);
+        const formattedData = eventsArray.filter(ev => ev !== null).map(ev => ({
           ...ev,
           id: ev._id || ev.id,
           price: ev.ticket_price
