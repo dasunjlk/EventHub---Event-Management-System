@@ -109,7 +109,8 @@ img {
 
 /* PREMIUM CARD & BUTTON POLISH */
 .glass-panel, .card, .event-card, [class*="card"] {
-  @apply transition-all duration-500 cubic-bezier(0.23, 1, 0.32, 1);
+  @apply transition-all duration-500;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .glass-panel:hover, .card:hover, .event-card:hover, [class*="card"]:hover {
