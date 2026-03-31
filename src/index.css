@@ -167,17 +167,17 @@ img {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(2, 6, 23, 0.45);
   backdrop-filter: blur(10px);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(71, 85, 105, 0.75);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(100, 116, 139, 0.95);
 }
 
 @keyframes gradient-x {
@@ -189,4 +189,4 @@ img {
 .animate-gradient-x {
   background-size: 200% 200%;
   animation: gradient-x 15s ease infinite;
-}
+}
