@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" fill="none">
+  <rect width="1200" height="675" fill="#111827"/>
+  <rect x="40" y="40" width="1120" height="595" rx="24" fill="#1F2937" stroke="#374151" stroke-width="2"/>
+  <circle cx="600" cy="280" r="70" fill="#374151"/>
+  <path d="M520 390C545 355 575 337 600 337C625 337 655 355 680 390" stroke="#6B7280" stroke-width="14" stroke-linecap="round"/>
+  <text x="600" y="490" text-anchor="middle" fill="#D1D5DB" font-size="44" font-family="Arial, sans-serif" font-weight="700">
+    Event Image Unavailable
+  </text>
+</svg>

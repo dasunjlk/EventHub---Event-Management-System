@@ -1,54 +1,82 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import { eventAPI } from '../services/api'
-import { getUserBookings, cancelBooking } from '../services/bookingService'
+import { cancelBooking, getUserBookings } from '../services/bookingService'
+
+const FALLBACK_EVENT_IMAGE = '/event-fallback.svg'
 
 const categoryColors = {
   Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
   Tech: 'glass-badge border-blue-500/30 text-blue-200 bg-blue-500/10 shadow-[0_0_10px_rgba(59,130,246,0.2)]',
   Art: 'glass-badge border-pink-500/30 text-pink-200 bg-pink-500/10 shadow-[0_0_10px_rgba(236,72,153,0.2)]',
   Education: 'glass-badge border-green-500/30 text-green-200 bg-green-500/10 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
-  Workshop: 'glass-badge border-orange-500/30 text-orange-200 bg-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.2)]'
+  Workshop: 'glass-badge border-orange-500/30 text-orange-200 bg-orange-500/10 shadow-[0_0_10px_rgba(249,115,22,0.2)]',
+}
+
+const formatReadableDate = (dateValue) => {
+  const parsedDate = new Date(dateValue)
+  if (Number.isNaN(parsedDate.getTime())) {
+    return 'Date will be announced'
+  }
+
+  return parsedDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 const EventDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+
   const [currentEvent, setCurrentEvent] = useState(null)
   const [events, setEvents] = useState([])
   const [userBooking, setUserBooking] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isCancelling, setIsCancelling] = useState(false)
+  const [heroImageSrc, setHeroImageSrc] = useState(FALLBACK_EVENT_IMAGE)
+  const [reloadCount, setReloadCount] = useState(0)
   const [error, setError] = useState('')
 
   useEffect(() => {
     const fetchEventData = async () => {
       setLoading(true)
       setError('')
+      setUserBooking(null)
+
       try {
-        const [event, allEvents] = await Promise.all([
+        const token = localStorage.getItem('token')
+        const bookingsPromise = token ? getUserBookings() : Promise.resolve([])
+
+        const [event, allEvents, bookings] = await Promise.all([
           eventAPI.getEventById(id),
           eventAPI.getAllEvents(),
+          bookingsPromise,
         ])
 
         setCurrentEvent(event)
-        setEvents(allEvents)
+        setHeroImageSrc(event?.image || FALLBACK_EVENT_IMAGE)
+        setEvents(Array.isArray(allEvents) ? allEvents : [])
 
-        // Check for existing user bookings if token exists
-        const token = localStorage.getItem('token')
-        if (token) {
-          const bookings = await getUserBookings()
-          const existing = bookings.find((b) => (b.event_id?._id || b.event_id) === id)
-          setUserBooking(existing)
+        if (Array.isArray(bookings) && bookings.length > 0) {
+          const existingBooking = bookings.find((booking) => {
+            const bookingEventId = booking.event_id?._id || booking.event_id
+            return String(bookingEventId) === String(id)
+          })
+
+          setUserBooking(existingBooking || null)
         }
       } catch (err) {
         if (err.response?.status === 404) {
           setCurrentEvent(null)
           setEvents([])
+          setHeroImageSrc(FALLBACK_EVENT_IMAGE)
         } else {
           console.error('Could not load event:', err)
-          setError('Failed to load events')
+          setError('Failed to load event details. Please try again.')
         }
       } finally {
         setLoading(false)
@@ -56,50 +84,7 @@ const EventDetails = () => {
     }
 
     fetchEventData()
-  }, [id])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
-        <p className="text-gray-400">Loading...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
-        <p className="text-red-400">{error}</p>
-      </div>
-    )
-  }
-
-  if (!currentEvent) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center pt-20 px-4 text-center">
-        <div className="text-7xl mb-6">:(</div>
-        <h1 className="text-3xl font-black text-white mb-3">Event not found</h1>
-        <p className="text-gray-400 mb-8 max-w-md">
-          The event you're looking for doesn't exist or may have been removed.
-        </p>
-        <Link to="/events" className="glass-btn">
-          Back to Events
-        </Link>
-      </div>
-    )
-  }
-
-  const {
-    title, date, time, location, category, price,
-    image, description, organizer, seats,
-  } = currentEvent
-
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
+  }, [id, reloadCount])
 
   const handleCancelBooking = async () => {
     if (!userBooking) return
@@ -108,11 +93,10 @@ const EventDetails = () => {
     setIsCancelling(true)
     try {
       await cancelBooking(userBooking._id)
-      
-      // Update UI ticket count and remove userBooking from state
+
       setCurrentEvent((prev) => ({
         ...prev,
-        seats: prev.seats + userBooking.ticket_quantity
+        seats: Number(prev?.seats || 0) + Number(userBooking.ticket_quantity || 0),
       }))
       setUserBooking(null)
       alert('Booking cancelled successfully')
@@ -123,15 +107,73 @@ const EventDetails = () => {
     }
   }
 
-  const badgeClass = categoryColors[category] || 'glass-badge border-white/20 text-white'
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20 px-4 text-center">
+        <div>
+          <div className="mx-auto mb-4 w-12 h-12 border-4 border-white/20 border-t-white/70 rounded-full animate-spin" />
+          <p className="text-gray-300">Loading event details...</p>
+        </div>
+      </div>
+    )
+  }
 
-  const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(location)}`
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center pt-20 px-4 text-center">
+        <div className="glass-panel p-8 max-w-xl">
+          <h2 className="text-2xl font-bold text-white mb-3">Could not load this event</h2>
+          <p className="text-red-300 mb-6">{error}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onClick={() => setReloadCount((prev) => prev + 1)} className="glass-btn px-8">
+              Retry
+            </button>
+            <Link to="/events" className="glass-btn px-8 border-white/20">
+              Back to Events
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  const related = events.filter((e) => e.category === category && e.id !== currentEvent.id).slice(0, 3)
+  if (!currentEvent) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center pt-20 px-4 text-center">
+        <div className="text-7xl mb-6">:(</div>
+        <h1 className="text-3xl font-black text-white mb-3">Event not found</h1>
+        <p className="text-gray-400 mb-8 max-w-md">
+          The event you are looking for does not exist or may have been removed.
+        </p>
+        <Link to="/events" className="glass-btn">
+          Back to Events
+        </Link>
+      </div>
+    )
+  }
+
+  const displayTitle = currentEvent.title || 'Untitled Event'
+  const displayCategory = currentEvent.category || 'General'
+  const displayLocation = currentEvent.location || 'Location will be announced'
+  const hasLocation = Boolean(currentEvent.location)
+  const displayDescription = currentEvent.description || 'Details for this event will be updated soon.'
+  const formattedDate = formatReadableDate(currentEvent.date)
+
+  const numericPrice = Number(currentEvent.price)
+  const hasValidPrice = Number.isFinite(numericPrice)
+  const displaySeats = Number.isFinite(Number(currentEvent.seats))
+    ? `${Number(currentEvent.seats)} seats left`
+    : 'Availability will be updated soon'
+
+  const badgeClass = categoryColors[displayCategory] || 'glass-badge border-white/20 text-white'
+  const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(displayLocation)}`
+
+  const relatedEvents = events
+    .filter((event) => event.category === displayCategory && event.id !== currentEvent.id)
+    .slice(0, 3)
 
   return (
     <div className="min-h-screen pt-20 pb-20">
-      {/* Back Button */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 pt-6">
         <button
           id="back-btn"
@@ -146,30 +188,30 @@ const EventDetails = () => {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Image */}
         <div className="relative overflow-hidden glass-panel !padding-0 aspect-[21/9] mb-8 shadow-2xl !p-0 border-white/20">
           <img
-            src={image}
-            alt={title}
+            src={heroImageSrc}
+            alt={displayTitle}
             className="w-full h-full object-cover"
+            onError={() => {
+              if (heroImageSrc !== FALLBACK_EVENT_IMAGE) {
+                setHeroImageSrc(FALLBACK_EVENT_IMAGE)
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          {/* Category badge on image */}
-          <span className={`absolute top-5 left-5 text-sm px-4 py-1.5 bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold rounded-full shadow-lg`}>
-            {category}
+          <span className={`absolute top-5 left-5 text-sm px-4 py-1.5 ${badgeClass}`}>
+            {displayCategory}
           </span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- Left: Main Info --- */}
           <div className="lg:col-span-2">
             <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-6">
-              {title}
+              {displayTitle}
             </h1>
 
-            {/* Meta info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              {/* Date */}
               <div className="flex items-start gap-3 glass-panel p-4">
                 <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
                   <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,13 +219,12 @@ const EventDetails = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Date & Time</p>
+                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Date</p>
                   <p className="text-white font-semibold text-sm">{formattedDate}</p>
-                  {time && <p className="text-gray-400 text-sm">{time}</p>}
+                  {currentEvent.time && <p className="text-gray-400 text-sm">{currentEvent.time}</p>}
                 </div>
               </div>
 
-              {/* Location */}
               <div className="flex items-start gap-3 glass-panel p-4">
                 <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
                   <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,12 +234,11 @@ const EventDetails = () => {
                 </div>
                 <div>
                   <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Location</p>
-                  <p className="text-white font-semibold text-sm">{location}</p>
+                  <p className="text-white font-semibold text-sm">{displayLocation}</p>
                 </div>
               </div>
 
-              {/* Organizer */}
-              {organizer && (
+              {currentEvent.organizer && (
                 <div className="flex items-start gap-3 glass-panel p-4">
                   <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
                     <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,12 +247,11 @@ const EventDetails = () => {
                   </div>
                   <div>
                     <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Organizer</p>
-                    <p className="text-white font-semibold text-sm">{organizer}</p>
+                    <p className="text-white font-semibold text-sm">{currentEvent.organizer}</p>
                   </div>
                 </div>
               )}
 
-              {/* Seats */}
               <div className="flex items-start gap-3 glass-panel p-4">
                 <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
                   <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,47 +260,54 @@ const EventDetails = () => {
                 </div>
                 <div>
                   <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Availability</p>
-                  <p className="text-white font-semibold text-sm">{seats} seats left</p>
+                  <p className="text-white font-semibold text-sm">{displaySeats}</p>
                 </div>
               </div>
             </div>
 
-            {/* Description */}
             <div className="mb-8">
               <h2 className="text-xl font-bold text-white mb-4">About This Event</h2>
               <p className="text-gray-300 leading-relaxed text-base">
-                {description}
+                {displayDescription}
               </p>
             </div>
 
-            {/* Show on Map Button */}
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              id="show-map-btn"
-              className="glass-btn inline-flex mb-8"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              Show Location on Map
-            </a>
+            {hasLocation ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                id="show-map-btn"
+                className="glass-btn inline-flex mb-8"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Show Location on Map
+              </a>
+            ) : (
+              <button className="glass-btn inline-flex mb-8 opacity-60 cursor-not-allowed" disabled>
+                Location unavailable
+              </button>
+            )}
           </div>
 
-          {/* --- Right: Ticket Box --- */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 glass-panel p-6 shadow-2xl">
               <div className="text-center mb-6">
                 <p className="text-gray-400 text-sm mb-1">Price per ticket</p>
                 <div className="text-4xl font-black text-white">
-                  {price === 0 ? (
-                    <span className="text-green-400">Free</span>
+                  {hasValidPrice ? (
+                    numericPrice === 0 ? (
+                      <span className="text-green-400">Free</span>
+                    ) : (
+                      <>
+                        <span className="text-2xl text-gray-400 font-normal">LKR </span>
+                        {numericPrice.toLocaleString()}
+                      </>
+                    )
                   ) : (
-                    <>
-                      <span className="text-2xl text-gray-400 font-normal">LKR </span>
-                      {price.toLocaleString()}
-                    </>
+                    <span className="text-gray-300 text-2xl">Price TBA</span>
                   )}
                 </div>
               </div>
@@ -310,15 +356,14 @@ const EventDetails = () => {
           </div>
         </div>
 
-        {/* Related Events */}
-        {related.length > 0 && (
+        {relatedEvents.length > 0 && (
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-white mb-6">
-              More {category} Events
+              More {displayCategory} Events
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {related.map((e) => (
-                <EventCard key={e.id} {...e} />
+              {relatedEvents.map((event) => (
+                <EventCard key={event.id} {...event} />
               ))}
             </div>
           </div>
