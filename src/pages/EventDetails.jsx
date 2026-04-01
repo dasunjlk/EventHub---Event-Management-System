@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import { eventAPI } from '../services/api'
+import { getUserBookings, cancelBooking } from '../services/bookingService'
 
 const categoryColors = {
   Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
@@ -16,7 +17,9 @@ const EventDetails = () => {
   const navigate = useNavigate()
   const [currentEvent, setCurrentEvent] = useState(null)
   const [events, setEvents] = useState([])
+  const [userBooking, setUserBooking] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isCancelling, setIsCancelling] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -31,14 +34,20 @@ const EventDetails = () => {
 
         setCurrentEvent(event)
         setEvents(allEvents)
+
+        // Check for existing user bookings if token exists
+        const token = localStorage.getItem('token')
+        if (token) {
+          const bookings = await getUserBookings()
+          const existing = bookings.find((b) => (b.event_id?._id || b.event_id) === id)
+          setUserBooking(existing)
+        }
       } catch (err) {
         if (err.response?.status === 404) {
           setCurrentEvent(null)
           setEvents([])
         } else {
           console.error('Could not load event:', err)
-          setCurrentEvent(null)
-          setEvents([])
           setError('Failed to load events')
         }
       } finally {
@@ -91,6 +100,28 @@ const EventDetails = () => {
     day: 'numeric',
     year: 'numeric',
   })
+
+  const handleCancelBooking = async () => {
+    if (!userBooking) return
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return
+
+    setIsCancelling(true)
+    try {
+      await cancelBooking(userBooking._id)
+      
+      // Update UI ticket count and remove userBooking from state
+      setCurrentEvent((prev) => ({
+        ...prev,
+        seats: prev.seats + userBooking.ticket_quantity
+      }))
+      setUserBooking(null)
+      alert('Booking cancelled successfully')
+    } catch (err) {
+      alert(err.message || 'Error occurred while cancelling booking')
+    } finally {
+      setIsCancelling(false)
+    }
+  }
 
   const badgeClass = categoryColors[category] || 'glass-badge border-white/20 text-white'
 
@@ -182,19 +213,17 @@ const EventDetails = () => {
               )}
 
               {/* Seats */}
-              {seats && (
-                <div className="flex items-start gap-3 glass-panel p-4">
-                  <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
-                    <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Capacity</p>
-                    <p className="text-white font-semibold text-sm">{seats} seats</p>
-                  </div>
+              <div className="flex items-start gap-3 glass-panel p-4">
+                <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">
+                  <svg className="w-5 h-5 text-white drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </div>
-              )}
+                <div>
+                  <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-0.5">Availability</p>
+                  <p className="text-white font-semibold text-sm">{seats} seats left</p>
+                </div>
+              </div>
             </div>
 
             {/* Description */}
@@ -225,7 +254,7 @@ const EventDetails = () => {
             <div className="sticky top-24 glass-panel p-6 shadow-2xl">
               <div className="text-center mb-6">
                 <p className="text-gray-400 text-sm mb-1">Price per ticket</p>
-                <p className="text-4xl font-black text-white">
+                <div className="text-4xl font-black text-white">
                   {price === 0 ? (
                     <span className="text-green-400">Free</span>
                   ) : (
@@ -234,10 +263,10 @@ const EventDetails = () => {
                       {price.toLocaleString()}
                     </>
                   )}
-                </p>
+                </div>
               </div>
 
-              <div className="space-y-3 mb-6 text-sm text-gray-400">
+              <div className="space-y-3 mb-6 text-sm text-gray-400 border-b border-white/10 pb-6">
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -248,27 +277,35 @@ const EventDetails = () => {
                   <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  Digital ticket via email
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
                   Secure checkout
                 </div>
               </div>
 
-              <button
-                id="book-ticket-btn"
-                onClick={() => navigate(`/book/${currentEvent.id}`)}
-                className="glass-btn w-full text-base py-3.5"
-              >
-                Book Ticket
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  id="book-ticket-btn"
+                  onClick={() => navigate(`/book/${id}`)}
+                  className="glass-btn w-full text-base py-3.5 shadow-lg"
+                >
+                  Book Ticket
+                </button>
 
-              <p className="text-center text-gray-600 text-xs mt-4">
-                No action performed - UI only
-              </p>
+                {userBooking && (
+                  <button
+                    id="cancel-booking-btn"
+                    onClick={handleCancelBooking}
+                    disabled={isCancelling}
+                    className="glass-btn w-full text-base py-3.5 border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] flex items-center justify-center gap-2"
+                  >
+                    {isCancelling ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Cancelling...
+                      </>
+                    ) : 'Cancel Booking'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

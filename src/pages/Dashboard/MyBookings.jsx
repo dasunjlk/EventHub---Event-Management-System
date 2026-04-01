@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
+import { getUserBookings, cancelBooking } from '../../services/bookingService';
 
 const statusColors = {
   Confirmed: 'border-green-500/30 text-green-200 bg-green-500/10',
@@ -21,14 +23,7 @@ export default function MyBookings() {
     try {
       setLoading(true);
       setError(null);
-
-      const res = await fetch('http://localhost:5000/api/bookings/user');
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch bookings');
-      }
-
-      const data = await res.json();
+      const data = await getUserBookings();
       setBookings(data);
     } catch (err) {
       setError(err.message || 'An error occurred while fetching bookings');
@@ -44,15 +39,7 @@ export default function MyBookings() {
 
     try {
       setCancellingId(id);
-
-      const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to cancel booking');
-      }
-
+      await cancelBooking(id);
       // Remove the cancelled booking from the UI immediately
       setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== id));
     } catch (err) {
@@ -118,7 +105,7 @@ export default function MyBookings() {
           ) : (
             <div className="grid gap-6">
               {bookings.map((booking) => {
-                const event = booking.event || {};
+                const eventData = booking.event_id || {};
 
                 // Determine status class based on booking status, default to Confirmed format
                 const statusLabel = booking.status
@@ -132,7 +119,7 @@ export default function MyBookings() {
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
                         <h2 className="text-2xl font-bold text-white drop-shadow-sm">
-                          {event.title || 'Event Details Unavailable'}
+                          {eventData.title || 'Event Details Unavailable'}
                         </h2>
                         <span className={`glass-badge ${statusClass}`}>
                           {statusLabel}
@@ -140,21 +127,21 @@ export default function MyBookings() {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-400 mb-6">
-                        {event.date && (
+                        {eventData.date && (
                           <div className="flex items-center gap-2">
                             <span className="text-lg opacity-80">📅</span>
-                            <span className="text-gray-200">{formatDate(event.date)}</span>
+                            <span className="text-gray-200">{formatDate(eventData.date)}</span>
                           </div>
                         )}
-                        {event.location && (
+                        {eventData.location && (
                           <div className="flex items-center gap-2">
                             <span className="text-lg opacity-80">📍</span>
-                            <span className="text-gray-200">{event.location}</span>
+                            <span className="text-gray-200">{eventData.location}</span>
                           </div>
                         )}
-                        {event.category && (
+                        {eventData.category && (
                           <div className="glass-badge border-white/10 text-gray-300 bg-white/5">
-                            {event.category}
+                            {eventData.category}
                           </div>
                         )}
                       </div>
