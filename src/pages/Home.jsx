@@ -41,6 +41,7 @@ const Home = () => {
   const navigate = useNavigate()
   const [authError, setAuthError] = useState('')
   const [featuredEvents, setFeaturedEvents] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -49,7 +50,7 @@ const Home = () => {
         if (!res.ok) throw new Error('Failed to fetch events');
         const data = await res.json();
         
-        const formattedData = data.map(ev => ({
+        const formattedData = (data || []).filter(ev => ev !== null).map(ev => ({
           ...ev,
           id: ev._id || ev.id,
           price: ev.ticket_price
@@ -73,30 +74,28 @@ const Home = () => {
     <>
       {/* ── Hero Section ── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950/50 to-gray-950" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent-600/10 via-transparent to-transparent" />
+        {/* Animated gradient background - reduced opacity for glass wallpaper */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
 
         {/* Decorative blobs */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-600/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-pulse" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 animate-slide-up">
           {/* Badge */}
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/60 border border-primary-700/50 text-primary-300 text-sm font-medium mb-8">
-            <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
+          <span className="glass-badge mb-8 px-4 py-1.5 text-sm gap-2">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
             10,000+ events listed across Sri Lanka
           </span>
 
           {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-2xl">
             Discover{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 animate-gradient-x">
               Amazing Events
             </span>
             <br />
-            Near You
+            <span className="text-gray-200">Near You</span>
           </h1>
 
           {/* Subtext */}
@@ -105,15 +104,25 @@ const Home = () => {
           </p>
 
           {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full">
-            <SearchBar placeholder="Search events, artists, venues..." />
-            <Link to="/events" id="hero-browse-btn" className="btn-primary whitespace-nowrap">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (searchQuery.trim()) navigate(`/events?search=${searchQuery.trim()}`)
+            }}
+            className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full"
+          >
+            <SearchBar 
+              placeholder="Search events, artists, venues..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
               Browse Events
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
-          </div>
+            </button>
+          </form> 
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 text-center">
@@ -130,12 +139,10 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent" />
       </section>
 
       {/* ── Categories Section ── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative -mt-px max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-12">
           <h2 className="section-heading">Browse by Category</h2>
           <p className="section-subheading">Find events that match your interests</p>
@@ -159,7 +166,7 @@ const Home = () => {
           <Link
             to="/events"
             id="see-all-events-btn"
-            className="btn-outline hidden sm:inline-flex text-sm py-2 px-5"
+            className="glass-btn hidden sm:inline-flex text-sm py-2 px-6"
           >
             See All
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,7 +183,7 @@ const Home = () => {
 
         {/* Mobile see all */}
         <div className="mt-10 text-center sm:hidden">
-          <Link to="/events" className="btn-outline">
+          <Link to="/events" className="glass-btn">
             See All Events
           </Link>
         </div>
@@ -184,8 +191,8 @@ const Home = () => {
 
       {/* ── Host Event CTA ── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-10">
-        <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-3xl p-10 sm:p-14 shadow-2xl relative overflow-hidden group text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/10 via-transparent to-accent-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="glass-panel p-10 sm:p-14 relative overflow-hidden group text-center">
+          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">Want to host an event?</h2>
             <p className="text-gray-400 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
@@ -195,12 +202,12 @@ const Home = () => {
               <Link 
                 to="/create-event" 
                 onClick={handleCreateEventClick}
-                className="btn-primary py-3.5 px-8 text-lg font-bold shadow-lg hover:shadow-primary-500/25 hover:-translate-y-1 transition-all duration-300"
+                className="glass-btn py-3.5 px-8 text-lg font-bold w-auto border-white/30"
               >
                 Create Event
               </Link>
               {authError && (
-                <div className="absolute top-full mt-3 px-4 py-2 bg-red-900/90 border border-red-800 text-red-200 text-sm font-semibold rounded-lg shadow-xl whitespace-nowrap animate-fadeIn z-20">
+                <div className="absolute top-full mt-3 px-4 py-2 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-sm font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-fadeIn z-20">
                   {authError}
                 </div>
               )}
@@ -210,17 +217,17 @@ const Home = () => {
       </section>
 
       {/* ── CTA Banner ── */}
-      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-3xl overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-500" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-accent-500/30 via-transparent to-transparent" />
+      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-[2rem] overflow-hidden relative glass-panel !p-0 border-white/20">
+        <div className="absolute inset-0 bg-white/5" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
         <div className="relative px-8 py-14 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 drop-shadow-md">
             Ready to experience something amazing?
           </h2>
-          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto drop-shadow-sm font-medium">
             Join thousands of people discovering great events every day.
           </p>
-          <Link to="/events" id="cta-browse-btn" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-700 font-bold rounded-xl hover:bg-primary-50 transition-all duration-200 hover:-translate-y-0.5 shadow-xl">
+          <Link to="/events" id="cta-browse-btn" className="glass-btn px-8 py-3.5 text-lg font-bold w-auto border-white/40">
             Explore All Events
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

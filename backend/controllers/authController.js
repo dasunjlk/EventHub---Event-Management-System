@@ -12,7 +12,7 @@ const generateToken = (id) => {
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Please provide all fields' });
@@ -31,10 +31,13 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
 
+    const assignedRole = role === 'organizer' ? 'organizer' : 'user';
+
     const user = await User.create({
       name,
       email,
       password,
+      role: assignedRole,
     });
 
     if (user) {
@@ -85,19 +88,18 @@ export const loginUser = async (req, res) => {
 // @access  Private
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-
-    if (user) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized' });
     }
+
+    res.json({
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    });
   } catch (error) {
+    console.error('Profile Controller Error:', error);
     res.status(500).json({ message: error.message || 'Server Error' });
   }
 };

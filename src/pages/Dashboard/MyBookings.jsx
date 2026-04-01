@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
+import { getUserBookings, cancelBooking } from '../../services/bookingService';
 
 const statusColors = {
-  Confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
-  Pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
-  Cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
+  Confirmed: 'border-green-500/30 text-green-200 bg-green-500/10',
+  Pending: 'border-yellow-500/30 text-yellow-200 bg-yellow-500/10',
+  Cancelled: 'border-red-500/30 text-red-200 bg-red-500/10',
 };
 
 export default function MyBookings() {
@@ -21,14 +23,7 @@ export default function MyBookings() {
     try {
       setLoading(true);
       setError(null);
-
-      const res = await fetch('http://localhost:5000/api/bookings/user');
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch bookings');
-      }
-
-      const data = await res.json();
+      const data = await getUserBookings();
       setBookings(data);
     } catch (err) {
       setError(err.message || 'An error occurred while fetching bookings');
@@ -44,15 +39,7 @@ export default function MyBookings() {
 
     try {
       setCancellingId(id);
-
-      const res = await fetch(`http://localhost:5000/api/bookings/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to cancel booking');
-      }
-
+      await cancelBooking(id);
       // Remove the cancelled booking from the UI immediately
       setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== id));
     } catch (err) {
@@ -79,10 +66,10 @@ export default function MyBookings() {
       <div className="min-h-screen pt-24 pb-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/40 border border-primary-700/40 text-primary-300 text-sm font-medium mb-5">
+            <span className="glass-badge border-primary-500/30 text-primary-200 bg-primary-500/10 mb-5">
               My Profile
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">
+            <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 drop-shadow-md">
               My Bookings
             </h1>
             <p className="text-gray-400 text-lg max-w-2xl">
@@ -92,106 +79,106 @@ export default function MyBookings() {
 
           {loading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white/50"></div>
             </div>
           ) : error ? (
-            <div className="card p-8 border-red-900/50 bg-red-900/10 text-center">
-              <p className="text-red-400 text-lg mb-4">{error}</p>
-              <button 
+            <div className="glass-panel p-8 bg-red-500/5 border-red-500/20 text-center">
+              <p className="text-red-300 text-lg mb-4">{error}</p>
+              <button
                 onClick={fetchBookings}
-                className="btn-primary"
+                className="glass-btn px-8"
               >
                 Try Again
               </button>
             </div>
           ) : bookings.length === 0 ? (
-            <div className="card p-12 text-center flex flex-col items-center justify-center">
-              <div className="text-6xl mb-6">🎫</div>
-              <h3 className="text-2xl font-bold text-white mb-3">You have no bookings yet.</h3>
-              <p className="text-gray-400 mb-8 max-w-md">
+            <div className="glass-panel p-12 text-center flex flex-col items-center justify-center">
+              <div className="text-6xl mb-6 filter drop-shadow-lg">🎫</div>
+              <h3 className="text-2xl font-bold text-white mb-3 drop-shadow-sm">You have no bookings yet.</h3>
+              <p className="text-gray-300 mb-8 max-w-md">
                 Looks like you haven't booked any events. Discover amazing events happening around you and secure your spot!
               </p>
-              <a href="/events" className="btn-primary">
+              <Link to="/events" className="glass-btn px-8 py-3">
                 Browse Events
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="grid gap-6">
               {bookings.map((booking) => {
-                const event = booking.event || {};
-                
+                const eventData = booking.event_id || {};
+
                 // Determine status class based on booking status, default to Confirmed format
-                const statusLabel = booking.status 
-                  ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) 
+                const statusLabel = booking.status
+                  ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
                   : 'Confirmed';
                 const statusClass = statusColors[statusLabel] || statusColors['Confirmed'];
 
                 return (
-                  <div key={booking._id} className="card p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:items-center relative">
+                  <div key={booking._id} className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:items-center relative shadow-2xl border-white/20">
                     {/* Event Details */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
-                        <h2 className="text-2xl font-bold text-white">
-                          {event.title || 'Event Details Unavailable'}
+                        <h2 className="text-2xl font-bold text-white drop-shadow-sm">
+                          {eventData.title || 'Event Details Unavailable'}
                         </h2>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold w-fit border ${statusClass}`}>
+                        <span className={`glass-badge ${statusClass}`}>
                           {statusLabel}
                         </span>
                       </div>
-                      
+
                       <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-400 mb-6">
-                        {event.date && (
+                        {eventData.date && (
                           <div className="flex items-center gap-2">
-                            <span className="text-lg">📅</span>
-                            <span>{formatDate(event.date)}</span>
+                            <span className="text-lg opacity-80">📅</span>
+                            <span className="text-gray-200">{formatDate(eventData.date)}</span>
                           </div>
                         )}
-                        {event.location && (
+                        {eventData.location && (
                           <div className="flex items-center gap-2">
-                            <span className="text-lg">📍</span>
-                            <span>{event.location}</span>
+                            <span className="text-lg opacity-80">📍</span>
+                            <span className="text-gray-200">{eventData.location}</span>
                           </div>
                         )}
-                        {event.category && (
-                          <div className="flex items-center gap-2 px-2.5 py-1 bg-gray-800 rounded-md text-gray-300 font-medium">
-                            {event.category}
+                        {eventData.category && (
+                          <div className="glass-badge border-white/10 text-gray-300 bg-white/5">
+                            {eventData.category}
                           </div>
                         )}
                       </div>
 
                       {/* Booking Meta Information */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-800">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Tickets</p>
-                          <p className="font-semibold text-gray-200">{booking.ticket_quantity || 0}</p>
+                          <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Tickets</p>
+                          <p className="font-bold text-white text-lg">{booking.ticket_quantity || 0}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Total Paid</p>
-                          <p className="font-semibold text-gray-200">
-                            LKR {booking.total_price ? booking.total_price.toLocaleString() : '0'}
+                          <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Total Paid</p>
+                          <p className="font-bold text-white text-lg">
+                            <span className="text-xs opacity-60 mr-1">LKR</span>{booking.total_price ? booking.total_price.toLocaleString() : '0'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Booked On</p>
-                          <p className="font-semibold text-gray-200">
+                          <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Booked On</p>
+                          <p className="font-bold text-white">
                             {formatDate(booking.booking_date)}
                           </p>
                         </div>
-                        <div className="col-span-2 sm:col-span-1 border-l border-gray-800 pl-4 hidden sm:block">
-                          <p className="text-xs text-gray-500 mb-1">Booking ID</p>
-                          <p className="font-semibold text-gray-400 text-xs truncate" title={booking._id}>
-                            {booking._id.slice(-8)}
+                        <div className="col-span-2 sm:col-span-1 border-l border-white/10 pl-4 hidden sm:block">
+                          <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Booking ID</p>
+                          <p className="font-mono text-gray-400 text-xs truncate" title={booking._id}>
+                            #{booking._id.slice(-8).toUpperCase()}
                           </p>
                         </div>
                       </div>
                     </div>
 
                     {/* Actions (Cancel button) */}
-                    <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-gray-800 flex flex-col justify-center">
+                    <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center">
                       <button
                         onClick={() => handleCancelBooking(booking._id)}
                         disabled={cancellingId === booking._id}
-                        className="w-full md:w-auto px-6 py-2.5 border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-red-500/20"
+                        className="w-full md:w-auto px-6 py-3 glass-btn border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2"
                       >
                         {cancellingId === booking._id ? (
                           <>

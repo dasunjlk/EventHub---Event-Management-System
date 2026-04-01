@@ -4,21 +4,21 @@ const BookingSummary = ({ price, quantity }) => {
   const total = price * quantity;
   
   return (
-    <div className="bg-gray-50 p-6 rounded-lg my-6 border border-gray-100">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">Booking Summary</h3>
+    <div className="glass-panel p-6 my-6">
+      <h3 className="text-lg font-bold mb-4 text-white drop-shadow-sm">Booking Summary</h3>
       <div className="space-y-3">
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-200">
           <span>Ticket Price</span>
-          <span>Rs {price.toLocaleString()}</span>
+          <span className="font-medium">Rs {price.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between text-gray-200">
           <span>Quantity</span>
-          <span>x {quantity}</span>
+          <span className="font-medium">x {quantity}</span>
         </div>
       </div>
-      <div className="flex justify-between border-t border-gray-200 mt-4 pt-4">
-        <span className="text-xl font-bold text-gray-800">Total Price</span>
-        <span className="text-xl font-bold text-blue-600">Rs {total.toLocaleString()}</span>
+      <div className="flex justify-between border-t border-white/20 mt-4 pt-4">
+        <span className="text-xl font-bold text-white">Total Price</span>
+        <span className="text-xl font-bold text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">Rs {total.toLocaleString()}</span>
       </div>
     </div>
   );

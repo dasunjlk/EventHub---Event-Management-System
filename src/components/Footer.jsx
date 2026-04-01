@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-950 border-t border-gray-800 mt-20">
+    <footer className="glass-panel !rounded-t-[3rem] !rounded-b-none !border-b-0 mt-20 shadow-[0_-8px_32px_rgba(0,0,0,0.3)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
@@ -34,7 +34,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     to={link.to}
-                    className="text-gray-400 hover:text-primary-400 text-sm transition-colors duration-200"
+                    className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] text-sm transition-all duration-300"
                   >
                     {link.label}
                   </Link>
@@ -51,7 +51,7 @@ const Footer = () => {
                 <li key={cat}>
                   <Link
                     to={`/events?category=${cat}`}
-                    className="text-gray-400 hover:text-primary-400 text-sm transition-colors duration-200"
+                    className="text-gray-300 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] text-sm transition-all duration-300"
                   >
                     {cat}
                   </Link>
@@ -62,11 +62,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-gray-500 text-sm">
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10">
+          <p className="text-gray-300 text-sm font-medium">
             © 2026 EventHub. All rights reserved.
           </p>
-          <p className="text-gray-600 text-xs">
+          <p className="text-gray-400 text-xs font-medium">
             Built with ❤️ for amazing experiences
           </p>
         </div>

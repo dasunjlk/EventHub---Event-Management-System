@@ -5,8 +5,28 @@ export const createBooking = async (bookingData) => {
     const response = await api.post('/bookings', bookingData);
     return response.data;
   } catch (error) {
-    console.error("Booking error:", error.response?.data?.message || error.message);
+    console.error("Booking error:", error);
     throw new Error(error.response?.data?.message || "Failed to create booking");
+  }
+};
+
+export const getUserBookings = async () => {
+  try {
+    const response = await api.get('/bookings/user');
+    return response.data.bookings;
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    throw new Error(error.response?.data?.message || "Failed to fetch bookings");
+  }
+};
+
+export const cancelBooking = async (bookingId) => {
+  try {
+    const response = await api.delete(`/bookings/${bookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    throw new Error(error.response?.data?.message || "Failed to cancel booking");
   }
 };
 

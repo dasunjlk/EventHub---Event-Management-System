@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'user' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -39,19 +39,19 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen pt-24 pb-20 px-4">
-      <div className="w-full max-w-md p-8 sm:p-10 space-y-8 bg-gray-900/50 backdrop-blur-md border border-blue-500 rounded-2xl shadow-2xl">
+      <div className="glass-panel w-full max-w-md p-8 sm:p-10 space-y-8 shadow-2xl border-white/20">
         <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-black text-white">Create Account</h2>
           <p className="mt-3 text-lg text-gray-400">Join EventHub today</p>
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-900/50 border border-red-800 rounded-xl" role="alert">
+          <div className="glass-panel p-4 text-sm text-red-200 bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]" role="alert">
             {error}
           </div>
         )}
         {success && (
-          <div className="p-4 text-sm text-green-200 bg-green-900/50 border border-green-800 rounded-xl" role="alert">
+          <div className="glass-panel p-4 text-sm text-green-200 bg-green-500/10 border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.1)]" role="alert">
             Registration successful! Redirecting to login...
           </div>
         )}
@@ -80,6 +80,14 @@ const Register = () => {
               className="input-field w-full"
               placeholder="name@company.com"
             />
+          </div>
+
+          <div>
+             <label className="block text-sm font-semibold text-gray-300 mb-2">Account Type</label>
+             <select name="role" value={formData.role} onChange={handleChange} className="input-field w-full text-white [&>option]:bg-black">
+                <option value="user">Attendee (Book Events)</option>
+                <option value="organizer">Organizer (Host Events)</option>
+             </select>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
@@ -116,7 +124,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading || success}
-            className="w-full btn-primary py-3 text-base font-bold disabled:opacity-50"
+            className="w-full glass-btn py-3 text-base font-bold"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
@@ -131,7 +139,7 @@ const Register = () => {
         <button
           type="button"
           onClick={() => { /* Mock Google Sign-In */ }}
-          className="w-full flex items-center justify-center gap-3 px-5 py-3 text-base font-semibold text-white transition-colors bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-700"
+          className="w-full glass-btn py-3 text-base font-semibold border-white/10 hover:border-white/20"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -156,7 +164,7 @@ const Register = () => {
 
         <p className="text-center text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-primary-400 hover:text-primary-300 transition-colors">
+          <Link to="/login" className="font-bold text-white drop-shadow-md hover:text-gray-200 transition-colors">
             Sign in
           </Link>
         </p>

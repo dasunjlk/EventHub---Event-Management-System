@@ -4,9 +4,9 @@ import EventCard from '../components/EventCard'
 import { getUserBookings } from '../services/bookingService'
 
 const statusColors = {
-    confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
-    pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
-    cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
+    Confirmed: 'glass-badge border-green-500/30 text-green-200 shadow-[0_0_10px_rgba(34,197,94,0.2)]',
+    Pending: 'glass-badge border-yellow-500/30 text-yellow-200 shadow-[0_0_10px_rgba(234,179,8,0.2)]',
+    Cancelled: 'glass-badge border-red-500/30 text-red-200 shadow-[0_0_10px_rgba(239,68,68,0.2)]',
 }
 
 export default function Dashboard() {
@@ -14,21 +14,17 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [authError, setAuthError] = useState('')
+    const [userRole, setUserRole] = useState('')
     const today = new Date()
 
-    useEffect(() => {
-        const fetchBookings = async () => {
+    React.useEffect(() => {
+        const userData = localStorage.getItem('user')
+        if (userData) {
             try {
-                const data = await getUserBookings();
-                setBookings(data);
-            } catch (err) {
-                setError(err.message || 'Failed to load dashboard data');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchBookings();
-    }, []);
+                setUserRole(JSON.parse(userData).role)
+            } catch (err) {}
+        }
+    }, [])
 
     const handleManageEventsClick = (e) => {
         if (!localStorage.getItem('token')) {
@@ -83,7 +79,7 @@ export default function Dashboard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <section className="mb-10">
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/40 border border-primary-700/40 text-primary-300 text-sm font-medium mb-5">
+                    <span className="glass-badge mb-5 px-4 py-1.5 shadow-sm">
                         Dashboard Overview
                     </span>
 
@@ -98,52 +94,51 @@ export default function Dashboard() {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
-                            <Link to="/events" className="btn-primary whitespace-nowrap px-6">
+                            <Link to="/events" className="glass-btn whitespace-nowrap shadow-lg">
                                 Browse Events
                             </Link>
-                            <Link to="/my-bookings" className="btn-outline whitespace-nowrap px-6">
-                                View All Bookings
-                            </Link>
-                            <div className="relative inline-flex flex-col items-center">
-                                <Link
-                                    to="/manage-events"
-                                    onClick={handleManageEventsClick}
-                                    className="btn-outline whitespace-nowrap shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300 px-6"
-                                >
-                                    Manage Events
-                                </Link>
-                                {authError && (
-                                    <div className="absolute top-full mt-2 px-3 py-1.5 bg-red-900/90 border border-red-800 text-red-200 text-xs font-semibold rounded-lg shadow-xl whitespace-nowrap animate-slide-up z-20">
-                                        {authError}
-                                    </div>
-                                )}
-                            </div>
+                            {(userRole === 'organizer' || userRole === 'admin') && (
+                                <div className="relative inline-flex flex-col items-center">
+                                    <Link 
+                                        to="/manage-events" 
+                                        onClick={handleManageEventsClick}
+                                        className="glass-btn whitespace-nowrap shadow-lg border-white/20 hover:border-white/40 transition-all duration-300"
+                                    >
+                                        Manage Events
+                                    </Link>
+                                    {authError && (
+                                        <div className="absolute top-full mt-2 px-3 py-1.5 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-xs font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-slide-up z-20">
+                                            {authError}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
 
                 {/* Summary Cards */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
-                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Total Bookings</p>
-                        <h2 className="text-3xl font-black text-white">{bookings.length}</h2>
-                        <p className="text-xs text-gray-500 mt-2 font-medium">All records</p>
+                    <div className="glass-panel p-6 shadow-2xl">
+                        <p className="text-sm font-semibold text-gray-400 mb-3">Total Bookings</p>
+                        <h2 className="text-3xl font-black text-white">{mockBookings.length}</h2>
+                        <p className="text-sm text-gray-500 mt-2">All booking records</p>
                     </div>
 
-                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
-                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Upcoming</p>
+                    <div className="glass-panel p-6 shadow-2xl">
+                        <p className="text-sm font-semibold text-gray-400 mb-3">Upcoming Events</p>
                         <h2 className="text-3xl font-black text-white">{upcomingBookings.length}</h2>
                         <p className="text-xs text-gray-500 mt-2 font-medium">Future events</p>
                     </div>
 
-                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
-                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Past</p>
+                    <div className="glass-panel p-6 shadow-2xl">
+                        <p className="text-sm font-semibold text-gray-400 mb-3">Past Events</p>
                         <h2 className="text-3xl font-black text-white">{pastBookings.length}</h2>
                         <p className="text-xs text-gray-500 mt-2 font-medium">Completed</p>
                     </div>
 
-                    <div className="card p-6 border border-gray-800/50 hover:border-primary-900/30 transition-colors bg-primary-900/5">
-                        <p className="text-sm font-semibold text-primary-400 mb-3 uppercase tracking-wider">Total Spent</p>
+                    <div className="glass-panel p-6 shadow-2xl">
+                        <p className="text-sm font-semibold text-gray-400 mb-3">Total Spent</p>
                         <h2 className="text-3xl font-black text-white">LKR {totalSpent.toLocaleString()}</h2>
                         <p className="text-xs text-gray-500 mt-2 font-medium">Active bookings</p>
                     </div>
@@ -180,11 +175,11 @@ export default function Dashboard() {
                             ))}
                         </div>
                     ) : (
-                        <div className="card p-12 text-center border-dashed border-2 border-gray-800/50">
-                            <div className="text-5xl mb-4 grayscale opacity-50">📅</div>
-                            <h3 className="text-xl font-bold text-white mb-2">No upcoming events</h3>
-                            <p className="text-gray-400 mb-8 max-w-sm mx-auto">You haven't booked any future events yet. Explore our latest events and book yours today!</p>
-                            <Link to="/events" className="btn-primary px-8">
+                        <div className="glass-panel p-10 text-center shadow-2xl">
+                            <div className="text-5xl mb-4 drop-shadow-md">📅</div>
+                            <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No upcoming events</h3>
+                            <p className="text-gray-300 mb-6">You have not booked any future events yet.</p>
+                            <Link to="/events" className="glass-btn shadow-lg">
                                 Explore Events
                             </Link>
                         </div>
@@ -192,14 +187,8 @@ export default function Dashboard() {
                 </section>
 
                 {/* Booking History */}
-                <section className="card p-6 sm:p-10 border border-gray-800/50 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
-                        <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                        </svg>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+                <section className="glass-panel p-6 sm:p-8 shadow-2xl">
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">Booking History</h2>
                             <p className="text-gray-400 text-sm">Your recent records and receipts</p>
@@ -207,33 +196,28 @@ export default function Dashboard() {
                         <span className="bg-gray-800 text-gray-400 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">{bookings.length} Total</span>
                     </div>
 
-                    {bookings.length > 0 ? (
-                        <div className="overflow-x-auto -mx-6 sm:mx-0">
-                            <table className="w-full min-w-[800px] text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-gray-800 text-gray-500 text-[10px] uppercase font-black tracking-[0.2em]">
-                                        <th className="pb-4 px-6">ID</th>
-                                        <th className="pb-4 pr-6">Event Details</th>
-                                        <th className="pb-4 pr-6">Event Date</th>
-                                        <th className="pb-4 pr-6 text-center">Tickets</th>
-                                        <th className="pb-4 pr-6 text-right">Amount</th>
-                                        <th className="pb-4 px-6 text-center">Status</th>
-                                    </tr>
-                                </thead>
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[760px] text-left">
+                            <thead>
+                                <tr className="border-b border-white/20 text-gray-300 text-sm">
+                                    <th className="py-4 pr-4 font-semibold">Booking ID</th>
+                                    <th className="py-4 pr-4 font-semibold">Event</th>
+                                    <th className="py-4 pr-4 font-semibold">Date</th>
+                                    <th className="py-4 pr-4 font-semibold">Tickets</th>
+                                    <th className="py-4 pr-4 font-semibold">Amount</th>
+                                    <th className="py-4 pr-4 font-semibold">Status</th>
+                                </tr>
+                            </thead>
 
-                                <tbody className="divide-y divide-gray-900/50">
-                                    {bookings.slice(0, 10).map((booking) => {
-                                        const statusClass =
-                                            statusColors[booking.status?.toLowerCase()] ||
-                                            'bg-gray-800 text-gray-300 border border-gray-700'
+                            <tbody>
+                                {mockBookings.map((booking) => {
+                                    const statusClass =
+                                        statusColors[booking.status] ||
+                                        'glass-badge bg-white/5 border-white/10'
 
-                                        return (
-                                            <tr key={booking._id} className="group hover:bg-white/[0.02] transition-colors">
-                                                <td className="py-5 px-6">
-                                                    <span className="text-[11px] font-mono text-gray-500 group-hover:text-primary-400 transition-colors uppercase">
-                                                        #{booking._id.slice(-8)}
-                                                    </span>
-                                                </td>
+                                    return (
+                                        <tr key={booking.id} className="border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors">
+                                            <td className="py-4 pr-4 text-sm text-gray-300 font-medium">{booking.id}</td>
 
                                                 <td className="py-5 pr-6">
                                                     <div className="flex flex-col">
