@@ -103,3 +103,84 @@ export const getUserProfile = async (req, res) => {
     res.status(500).json({ message: error.message || 'Server Error' });
   }
 };
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user?.userId || req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { name, email, currentPassword, newPassword } = req.body;
+
+    if (name !== undefined) {
+      const trimmedName = String(name).trim();
+      if (!trimmedName) {
+        return res.status(400).json({ message: 'Name cannot be empty' });
+      }
+      user.name = trimmedName;
+    }
+
+    if (email !== undefined) {
+      const normalizedEmail = String(email).trim().toLowerCase();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(normalizedEmail)) {
+        return res.status(400).json({ message: 'Please provide a valid email address' });
+      }
+
+      if (normalizedEmail !== user.email) {
+        const emailExists = await User.findOne({ email: normalizedEmail });
+        if (emailExists) {
+          return res.status(400).json({ message: 'User already exists with this email' });
+        }
+      }
+
+      user.email = normalizedEmail;
+    }
+
+    if (newPassword !== undefined && String(newPassword).trim() !== '') {
+      if (!currentPassword) {
+        return res.status(400).json({ message: 'Current password is required to set a new password' });
+      }
+
+      const isCurrentPasswordValid = await user.matchPassword(String(currentPassword));
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(String(newPassword))) {
+        return res.status(400).json({
+          message: 'New password must be at least 8 characters long and contain both letters and numbers.',
+        });
+      }
+
+      user.password = String(newPassword);
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      token: generateToken(updatedUser._id),
+    });
+  } catch (error) {
+    console.error('Update Profile Error:', error);
+    res.status(500).json({ message: error.message || 'Server Error' });
+  }
+};

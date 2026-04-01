@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
 import { getUserBookings, cancelBooking } from '../../services/bookingService';
 
 const statusColors = {
@@ -24,7 +23,7 @@ export default function MyBookings() {
       setLoading(true);
       setError(null);
       const data = await getUserBookings();
-      setBookings(data);
+      setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || 'An error occurred while fetching bookings');
     } finally {
@@ -62,12 +61,11 @@ export default function MyBookings() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen pt-24 pb-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <span className="glass-badge border-primary-500/30 text-primary-200 bg-primary-500/10 mb-5">
-              My Profile
+              Booking Center
             </span>
             <h1 className="text-4xl sm:text-5xl font-black text-white mb-3 drop-shadow-md">
               My Bookings
@@ -93,7 +91,7 @@ export default function MyBookings() {
             </div>
           ) : bookings.length === 0 ? (
             <div className="glass-panel p-12 text-center flex flex-col items-center justify-center">
-              <div className="text-6xl mb-6 filter drop-shadow-lg">🎫</div>
+              <div className="text-6xl mb-6 filter drop-shadow-lg">[]</div>
               <h3 className="text-2xl font-bold text-white mb-3 drop-shadow-sm">You have no bookings yet.</h3>
               <p className="text-gray-300 mb-8 max-w-md">
                 Looks like you haven't booked any events. Discover amazing events happening around you and secure your spot!

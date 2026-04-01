@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
@@ -9,66 +9,96 @@ const categories = ['All', 'Music', 'Tech', 'Art', 'Education', 'Workshop']
 
 const Events = () => {
   const [searchParams, setSearchParams] = useSearchParams()
-  const initialCategory = searchParams.get('category') || 'All'
-
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
-  const selectedCategory = searchParams.get('category') || 'All'
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true)
-      setError('')
-      try {
-        const data = await eventAPI.getAllEvents()
-        setEvents(data)
-      } catch (err) {
-        console.error('Could not load events:', err)
-        setError('Failed to load events')
-      } finally {
-        setLoading(false)
-      }
+  const categoryFromUrl = searchParams.get('category') || 'All'
+  const selectedCategory = categories.includes(categoryFromUrl) ? categoryFromUrl : 'All'
+
+  const fetchEvents = async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const data = await eventAPI.getAllEvents()
+      setEvents(Array.isArray(data) ? data : [])
+    } catch (err) {
+      console.error('Could not load events:', err)
+      setError('Failed to load events. Please try again.')
+      setEvents([])
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchEvents()
   }, [])
 
-  // Sync search query from URL if it changes externally
   useEffect(() => {
     const urlSearch = searchParams.get('search') || ''
     if (urlSearch !== searchQuery) {
       setSearchQuery(urlSearch)
     }
-  }, [searchParams])
+
+    const urlCategory = searchParams.get('category')
+    if (urlCategory && !categories.includes(urlCategory)) {
+      const cleanedParams = new URLSearchParams(searchParams)
+      cleanedParams.delete('category')
+      setSearchParams(cleanedParams, { replace: true })
+    }
+  }, [searchParams, searchQuery, setSearchParams])
 
   const handleSearchChange = (e) => {
-    const val = e.target.value
-    setSearchQuery(val)
+    const value = e.target.value
+    setSearchQuery(value)
+
     const newParams = new URLSearchParams(searchParams)
-    if (val) newParams.set('search', val)
-    else newParams.delete('search')
+    const trimmed = value.trim()
+
+    if (trimmed) {
+      newParams.set('search', trimmed)
+    } else {
+      newParams.delete('search')
+    }
+
     setSearchParams(newParams, { replace: true })
   }
 
-  const handleCategoryChange = (cat) => {
+  const handleCategoryChange = (category) => {
     const newParams = new URLSearchParams(searchParams)
-    if (cat === 'All') newParams.delete('category')
-    else newParams.set('category', cat)
-    setSearchParams(newParams)
+
+    if (category === 'All') {
+      newParams.delete('category')
+    } else {
+      newParams.set('category', category)
+    }
+
+    setSearchParams(newParams, { replace: true })
+  }
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSearchParams({}, { replace: true })
   }
 
   const filteredEvents = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase()
 
     return events.filter((event) => {
-      const matchesSearch = event.title.toLowerCase().includes(normalizedQuery)
-      const matchesCategory =
-        selectedCategory === 'All' || event.category === selectedCategory
+      const eventTitle = (event.title || '').toLowerCase()
+      const eventCategory = event.category || ''
+
+      const matchesSearch = !normalizedQuery || eventTitle.includes(normalizedQuery)
+      const matchesCategory = selectedCategory === 'All' || eventCategory === selectedCategory
 
       return matchesSearch && matchesCategory
     })
   }, [events, searchQuery, selectedCategory])
+
+  const hasActiveFilters = selectedCategory !== 'All' || searchQuery.trim() !== ''
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -106,8 +136,11 @@ const Events = () => {
             <p className="text-gray-400">Loading events...</p>
           </div>
         ) : error ? (
-          <div className="text-center py-24">
-            <p className="text-red-400">{error}</p>
+          <div className="glass-panel p-8 text-center max-w-2xl mx-auto">
+            <p className="text-red-300 text-lg mb-5">{error}</p>
+            <button onClick={fetchEvents} className="glass-btn px-8">
+              Try Again
+            </button>
           </div>
         ) : filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -116,8 +149,20 @@ const Events = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-24">
-            <h3 className="text-2xl font-bold text-white mb-2">No events found</h3>
+          <div className="glass-panel p-10 text-center max-w-3xl mx-auto">
+            <h3 className="text-2xl font-bold text-white mb-3">
+              {hasActiveFilters ? 'No events match your filters' : 'No events available right now'}
+            </h3>
+            <p className="text-gray-300 mb-6">
+              {hasActiveFilters
+                ? 'Try another search term or category.'
+                : 'Please check back soon for new event listings.'}
+            </p>
+            {hasActiveFilters && (
+              <button onClick={clearFilters} className="glass-btn px-8">
+                Clear Filters
+              </button>
+            )}
           </div>
         )}
       </div>

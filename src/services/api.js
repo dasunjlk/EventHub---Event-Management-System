@@ -32,6 +32,9 @@ export const authAPI = {
   },
   getProfile: async () => {
     return api.get('/auth/profile');
+  },
+  updateProfile: async (profileData) => {
+    return api.put('/auth/profile', profileData);
   }
 };
 
