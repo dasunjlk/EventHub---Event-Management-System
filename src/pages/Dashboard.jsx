@@ -1,75 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import EventCard from '../components/EventCard'
-
-const mockBookings = [
-    {
-        id: 'BK-1001',
-        eventId: 1,
-        eventTitle: 'Colombo Music Festival 2026',
-        category: 'Music',
-        eventDate: '2026-04-18',
-        location: 'Colombo',
-        image:
-            'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80',
-        ticketQuantity: 2,
-        totalPrice: 5000,
-        bookingDate: '2026-03-20',
-        status: 'Confirmed',
-    },
-    {
-        id: 'BK-1002',
-        eventId: 2,
-        eventTitle: 'Sri Lanka Tech Summit',
-        category: 'Tech',
-        eventDate: '2026-04-05',
-        location: 'Kandy',
-        image:
-            'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
-        ticketQuantity: 1,
-        totalPrice: 3500,
-        bookingDate: '2026-03-18',
-        status: 'Pending',
-    },
-    {
-        id: 'BK-1003',
-        eventId: 3,
-        eventTitle: 'Creative Art Expo',
-        category: 'Art',
-        eventDate: '2026-02-15',
-        location: 'Galle',
-        image:
-            'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1200&q=80',
-        ticketQuantity: 3,
-        totalPrice: 6000,
-        bookingDate: '2026-02-01',
-        status: 'Confirmed',
-    },
-    {
-        id: 'BK-1004',
-        eventId: 4,
-        eventTitle: 'Startup Workshop Bootcamp',
-        category: 'Workshop',
-        eventDate: '2026-01-28',
-        location: 'Negombo',
-        image:
-            'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
-        ticketQuantity: 1,
-        totalPrice: 2000,
-        bookingDate: '2026-01-10',
-        status: 'Cancelled',
-    },
-]
+import { getUserBookings } from '../services/bookingService'
 
 const statusColors = {
-    Confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
-    Pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
-    Cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
+    confirmed: 'bg-green-900/50 text-green-300 border border-green-800',
+    pending: 'bg-yellow-900/50 text-yellow-300 border border-yellow-800',
+    cancelled: 'bg-red-900/50 text-red-300 border border-red-800',
 }
 
 export default function Dashboard() {
+    const [bookings, setBookings] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
     const [authError, setAuthError] = useState('')
     const today = new Date()
+
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                const data = await getUserBookings();
+                setBookings(data);
+            } catch (err) {
+                setError(err.message || 'Failed to load dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBookings();
+    }, []);
 
     const handleManageEventsClick = (e) => {
         if (!localStorage.getItem('token')) {
@@ -79,17 +38,45 @@ export default function Dashboard() {
         }
     }
 
-    const upcomingBookings = mockBookings.filter(
-        (booking) => new Date(`${booking.eventDate}T00:00:00`) >= new Date(today.toDateString())
-    )
+    const upcomingBookings = bookings.filter((booking) => {
+        if (!booking.event_id?.date) return false;
+        const eventDate = new Date(booking.event_id.date);
+        return eventDate >= new Date(today.toDateString());
+    })
 
-    const pastBookings = mockBookings.filter(
-        (booking) => new Date(`${booking.eventDate}T00:00:00`) < new Date(today.toDateString())
-    )
+    const pastBookings = bookings.filter((booking) => {
+        if (!booking.event_id?.date) return true;
+        const eventDate = new Date(booking.event_id.date);
+        return eventDate < new Date(today.toDateString());
+    })
 
-    const totalSpent = mockBookings
-        .filter((booking) => booking.status !== 'Cancelled')
-        .reduce((sum, booking) => sum + booking.totalPrice, 0)
+    const totalSpent = bookings
+        .filter((booking) => booking.status !== 'cancelled' && booking.status !== 'Cancelled')
+        .reduce((sum, booking) => sum + (booking.total_price || 0), 0)
+
+    if (loading) {
+        return (
+            <div className="min-h-screen pt-24 pb-20 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-400 text-lg animate-pulse font-medium">Preparing your dashboard...</p>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen pt-24 pb-20 flex flex-col items-center justify-center px-4 text-center">
+                <div className="w-20 h-20 bg-red-900/20 border border-red-800/30 rounded-2xl flex items-center justify-center text-4xl mb-6">
+                    ⚠️
+                </div>
+                <h3 className="text-2xl font-black text-white mb-2">Failed to load dashboard</h3>
+                <p className="text-gray-400 mb-8 max-w-md">{error}</p>
+                <button onClick={() => window.location.reload()} className="btn-primary px-8">
+                    Try Again
+                </button>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen pt-24 pb-20">
@@ -105,20 +92,23 @@ export default function Dashboard() {
                             <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">
                                 My Dashboard
                             </h1>
-                            <p className="text-gray-400 text-lg max-w-2xl">
+                            <p className="text-gray-400 text-lg max-w-2xl leading-relaxed">
                                 View your upcoming events, booking activity, and booking history in one place.
                             </p>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
-                            <Link to="/events" className="btn-primary whitespace-nowrap">
+                            <Link to="/events" className="btn-primary whitespace-nowrap px-6">
                                 Browse Events
                             </Link>
+                            <Link to="/my-bookings" className="btn-outline whitespace-nowrap px-6">
+                                View All Bookings
+                            </Link>
                             <div className="relative inline-flex flex-col items-center">
-                                <Link 
-                                    to="/manage-events" 
+                                <Link
+                                    to="/manage-events"
                                     onClick={handleManageEventsClick}
-                                    className="btn-outline whitespace-nowrap shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300"
+                                    className="btn-outline whitespace-nowrap shadow-lg hover:shadow-primary-500/20 hover:-translate-y-0.5 transition-all duration-300 px-6"
                                 >
                                     Manage Events
                                 </Link>
@@ -134,64 +124,67 @@ export default function Dashboard() {
 
                 {/* Summary Cards */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-                    <div className="card p-6">
-                        <p className="text-sm font-semibold text-gray-400 mb-3">Total Bookings</p>
-                        <h2 className="text-3xl font-black text-white">{mockBookings.length}</h2>
-                        <p className="text-sm text-gray-500 mt-2">All booking records</p>
+                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
+                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Total Bookings</p>
+                        <h2 className="text-3xl font-black text-white">{bookings.length}</h2>
+                        <p className="text-xs text-gray-500 mt-2 font-medium">All records</p>
                     </div>
 
-                    <div className="card p-6">
-                        <p className="text-sm font-semibold text-gray-400 mb-3">Upcoming Events</p>
+                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
+                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Upcoming</p>
                         <h2 className="text-3xl font-black text-white">{upcomingBookings.length}</h2>
-                        <p className="text-sm text-gray-500 mt-2">Future event bookings</p>
+                        <p className="text-xs text-gray-500 mt-2 font-medium">Future events</p>
                     </div>
 
-                    <div className="card p-6">
-                        <p className="text-sm font-semibold text-gray-400 mb-3">Past Events</p>
+                    <div className="card p-6 border border-gray-800/50 hover:border-gray-700/50 transition-colors">
+                        <p className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">Past</p>
                         <h2 className="text-3xl font-black text-white">{pastBookings.length}</h2>
-                        <p className="text-sm text-gray-500 mt-2">Completed events</p>
+                        <p className="text-xs text-gray-500 mt-2 font-medium">Completed</p>
                     </div>
 
-                    <div className="card p-6">
-                        <p className="text-sm font-semibold text-gray-400 mb-3">Total Spent</p>
+                    <div className="card p-6 border border-gray-800/50 hover:border-primary-900/30 transition-colors bg-primary-900/5">
+                        <p className="text-sm font-semibold text-primary-400 mb-3 uppercase tracking-wider">Total Spent</p>
                         <h2 className="text-3xl font-black text-white">LKR {totalSpent.toLocaleString()}</h2>
-                        <p className="text-sm text-gray-500 mt-2">Excluding cancelled bookings</p>
+                        <p className="text-xs text-gray-500 mt-2 font-medium">Active bookings</p>
                     </div>
                 </section>
 
                 {/* Upcoming Events */}
-                <section className="mb-10">
+                <section className="mb-12">
                     <div className="flex items-end justify-between mb-6">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">Upcoming Events</h2>
-                            <p className="text-gray-400 text-sm">Reusable event cards for your next bookings</p>
+                            <p className="text-gray-400 text-sm">Your next scheduled experiences</p>
                         </div>
-                        <Link to="/events" className="text-primary-400 hover:text-primary-300 text-sm font-semibold">
-                            View all events
+                        <Link to="/my-bookings" className="text-primary-400 hover:text-primary-300 text-sm font-bold flex items-center gap-1 transition-colors">
+                            View all
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
                         </Link>
                     </div>
 
                     {upcomingBookings.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {upcomingBookings.map((booking) => (
+                            {upcomingBookings.slice(0, 3).map((booking) => (
                                 <EventCard
-                                    key={booking.id}
-                                    id={booking.eventId}
-                                    title={booking.eventTitle}
-                                    date={booking.eventDate}
-                                    location={booking.location}
-                                    price={booking.totalPrice}
-                                    image={booking.image}
-                                    category={booking.category}
+                                    key={booking._id}
+                                    id={booking.event_id?._id}
+                                    title={booking.event_id?.title || 'Event Unavailable'}
+                                    date={booking.event_id?.date}
+                                    location={booking.event_id?.location}
+                                    price={booking.total_price}
+                                    image={booking.event_id?.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200&q=80'}
+                                    category={booking.event_id?.category || 'Event'}
                                 />
                             ))}
                         </div>
                     ) : (
-                        <div className="card p-10 text-center">
-                            <div className="text-5xl mb-4">📅</div>
+                        <div className="card p-12 text-center border-dashed border-2 border-gray-800/50">
+                            <div className="text-5xl mb-4 grayscale opacity-50">📅</div>
                             <h3 className="text-xl font-bold text-white mb-2">No upcoming events</h3>
-                            <p className="text-gray-400 mb-6">You have not booked any future events yet.</p>
-                            <Link to="/events" className="btn-primary">
+                            <p className="text-gray-400 mb-8 max-w-sm mx-auto">You haven't booked any future events yet. Explore our latest events and book yours today!</p>
+                            <Link to="/events" className="btn-primary px-8">
                                 Explore Events
                             </Link>
                         </div>
@@ -199,69 +192,94 @@ export default function Dashboard() {
                 </section>
 
                 {/* Booking History */}
-                <section className="card p-6 sm:p-8">
-                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+                <section className="card p-6 sm:p-10 border border-gray-800/50 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                        <svg className="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                        </svg>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">Booking History</h2>
-                            <p className="text-gray-400 text-sm">Your current and past bookings</p>
+                            <p className="text-gray-400 text-sm">Your recent records and receipts</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <span className="text-gray-500 text-sm">{mockBookings.length} total records</span>
-                            <Link to="/my-bookings" className="text-primary-400 hover:text-primary-300 text-sm font-semibold">
-                                View full history
-                            </Link>
-                        </div>
+                        <span className="bg-gray-800 text-gray-400 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">{bookings.length} Total</span>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[760px] text-left">
-                            <thead>
-                                <tr className="border-b border-gray-800 text-gray-400 text-sm">
-                                    <th className="py-4 pr-4 font-semibold">Booking ID</th>
-                                    <th className="py-4 pr-4 font-semibold">Event</th>
-                                    <th className="py-4 pr-4 font-semibold">Date</th>
-                                    <th className="py-4 pr-4 font-semibold">Tickets</th>
-                                    <th className="py-4 pr-4 font-semibold">Amount</th>
-                                    <th className="py-4 pr-4 font-semibold">Status</th>
-                                </tr>
-                            </thead>
+                    {bookings.length > 0 ? (
+                        <div className="overflow-x-auto -mx-6 sm:mx-0">
+                            <table className="w-full min-w-[800px] text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-gray-800 text-gray-500 text-[10px] uppercase font-black tracking-[0.2em]">
+                                        <th className="pb-4 px-6">ID</th>
+                                        <th className="pb-4 pr-6">Event Details</th>
+                                        <th className="pb-4 pr-6">Event Date</th>
+                                        <th className="pb-4 pr-6 text-center">Tickets</th>
+                                        <th className="pb-4 pr-6 text-right">Amount</th>
+                                        <th className="pb-4 px-6 text-center">Status</th>
+                                    </tr>
+                                </thead>
 
-                            <tbody>
-                                {mockBookings.map((booking) => {
-                                    const statusClass =
-                                        statusColors[booking.status] ||
-                                        'bg-gray-800 text-gray-300 border border-gray-700'
+                                <tbody className="divide-y divide-gray-900/50">
+                                    {bookings.slice(0, 10).map((booking) => {
+                                        const statusClass =
+                                            statusColors[booking.status?.toLowerCase()] ||
+                                            'bg-gray-800 text-gray-300 border border-gray-700'
 
-                                    return (
-                                        <tr key={booking.id} className="border-b border-gray-900 last:border-b-0">
-                                            <td className="py-4 pr-4 text-sm text-gray-300 font-medium">{booking.id}</td>
+                                        return (
+                                            <tr key={booking._id} className="group hover:bg-white/[0.02] transition-colors">
+                                                <td className="py-5 px-6">
+                                                    <span className="text-[11px] font-mono text-gray-500 group-hover:text-primary-400 transition-colors uppercase">
+                                                        #{booking._id.slice(-8)}
+                                                    </span>
+                                                </td>
 
-                                            <td className="py-4 pr-4">
-                                                <div>
-                                                    <p className="text-white font-semibold">{booking.eventTitle}</p>
-                                                    <p className="text-gray-500 text-sm">Booked on {booking.bookingDate}</p>
-                                                </div>
-                                            </td>
+                                                <td className="py-5 pr-6">
+                                                    <div className="flex flex-col">
+                                                        <p className="text-white font-bold group-hover:text-primary-300 transition-colors leading-tight mb-1">
+                                                            {booking.event_id?.title || 'Unknown Event'}
+                                                        </p>
+                                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                                            Booked on {new Date(booking.booking_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                        </p>
+                                                    </div>
+                                                </td>
 
-                                            <td className="py-4 pr-4 text-sm text-gray-400">{booking.eventDate}</td>
+                                                <td className="py-5 pr-6">
+                                                    <p className="text-sm text-gray-400 font-medium">
+                                                        {booking.event_id?.date ? new Date(booking.event_id.date).toLocaleDateString() : 'TBD'}
+                                                    </p>
+                                                </td>
 
-                                            <td className="py-4 pr-4 text-sm text-gray-300">{booking.ticketQuantity}</td>
+                                                <td className="py-5 pr-6 text-center">
+                                                    <span className="bg-gray-800/50 py-1 px-3 rounded-md text-xs text-gray-300 font-bold">
+                                                        {booking.ticket_quantity}
+                                                    </span>
+                                                </td>
 
-                                            <td className="py-4 pr-4 text-sm text-gray-300">
-                                                LKR {booking.totalPrice.toLocaleString()}
-                                            </td>
+                                                <td className="py-5 pr-6 text-right">
+                                                    <p className="text-sm text-white font-black">
+                                                        LKR {(booking.total_price || 0).toLocaleString()}
+                                                    </p>
+                                                </td>
 
-                                            <td className="py-4 pr-4">
-                                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${statusClass}`}>
-                                                    {booking.status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                                <td className="py-5 px-6 text-center">
+                                                    <span className={`inline-flex px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${statusClass}`}>
+                                                        {booking.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="py-10 text-center">
+                            <p className="text-gray-500 font-medium">No booking activity found.</p>
+                        </div>
+                    )}
                 </section>
             </div>
         </div>

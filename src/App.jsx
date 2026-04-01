@@ -11,8 +11,7 @@ import BookingPage from './pages/BookingPage'
 import BookingSuccess from './pages/BookingSuccess'
 import Dashboard from './pages/Dashboard'
 import ManageEvents from './pages/ManageEvents'
-import Profile from './pages/Profile'
-import ProtectedRoute from './components/ProtectedRoute'
+import MyBookings from './pages/MyBookings'
 
 function App() {
   return (
@@ -26,17 +25,17 @@ function App() {
             <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
-            <Route path="/book/:eventId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
-            <Route path="/booking-success" element={<ProtectedRoute><BookingSuccess /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/manage-events" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/book/:eventId" element={<BookingPage />} />
+            <Route path="/booking-success" element={<BookingSuccess />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/manage-events" element={<ManageEvents />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
           </Routes>
         </main>
         <Footer />
-      </div>
-    </BrowserRouter>
+      </div >
+    </BrowserRouter >
   )
 }
 
