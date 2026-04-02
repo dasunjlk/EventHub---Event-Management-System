@@ -28,11 +28,7 @@ function App() {
         try {
           await authAPI.getProfile()
         } catch (error) {
-          if (error.response?.status === 401) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
-            window.location.href = '/login'
-          }
+          // Global interceptor handles 401 redirect/cleanup
         }
       }
     }
