@@ -112,6 +112,16 @@ const Navbar = () => {
                         </svg>
                         My Profile
                       </Link>
+                      <Link
+                        to="/my-bookings"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        My Bookings
+                      </Link>
                       <hr className="border-white/10 my-1" />
                       <button
                         onClick={handleLogout}
@@ -179,6 +189,12 @@ const Navbar = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 My Profile
+              </NavLink>
+              <NavLink to="/my-bookings" className={(props) => `${navLinkClass(props)} flex items-center gap-3`} id="mobile-nav-bookings">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                My Bookings
               </NavLink>
               <button
                 onClick={handleLogout}

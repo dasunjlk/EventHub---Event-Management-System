@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ConfirmModal from '../../components/ConfirmModal';
 import { getUserBookings, cancelBooking } from '../../services/bookingService';
 
 const statusColors = {
@@ -13,6 +14,8 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   useEffect(() => {
     fetchBookings();
@@ -31,10 +34,14 @@ export default function MyBookings() {
     }
   };
 
-  const handleCancelBooking = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this booking?')) {
-      return;
-    }
+  const handleCancelBooking = (id) => {
+    setSelectedBookingId(id);
+    setModalOpen(true);
+  };
+
+  const confirmCancellation = async () => {
+    if (!selectedBookingId) return;
+    const id = selectedBookingId;
 
     try {
       setCancellingId(id);
@@ -193,6 +200,16 @@ export default function MyBookings() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={confirmCancellation}
+        title="Cancel Booking"
+        message="Are you sure you want to cancel this booking? This will remove your reservation for the event."
+        confirmText="Yes, Cancel Booking"
+        cancelText="No, Keep It"
+      />
     </>
   );
 }
