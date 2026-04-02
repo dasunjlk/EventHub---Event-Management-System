@@ -10,6 +10,7 @@ import Register from './pages/Register'
 import CreateEvent from './pages/CreateEvent'
 import BookingPage from './pages/BookingPage'
 import BookingSuccess from './pages/BookingSuccess'
+import PaymentGateway from './pages/PaymentGateway'
 import Dashboard from './pages/Dashboard'
 import ManageEvents from './pages/ManageEvents'
 import Profile from './pages/Profile'
@@ -48,6 +49,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
             <Route path="/book/:eventId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
+            <Route path="/payment" element={<ProtectedRoute><PaymentGateway /></ProtectedRoute>} />
             <Route path="/booking-success" element={<ProtectedRoute><BookingSuccess /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/manage-events" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />

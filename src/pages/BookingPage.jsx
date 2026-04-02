@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
+import ConfirmModal from '../components/ConfirmModal';
 import { createBooking, getUserBookings, cancelBooking } from '../services/bookingService';
 import { eventAPI } from '../services/api';
 
@@ -13,6 +14,7 @@ const BookingPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -75,32 +77,24 @@ const BookingPage = () => {
     }
 
     setIsBooking(true);
-    try {
-      const bookingData = {
-        event_id: event._id || event.id,
-        ticket_quantity: quantity
-      };
-      
-      const response = await createBooking(bookingData);
-      
-      if (response.success) {
-        navigate('/booking-success', { 
-          state: { 
-            bookingDetails: response.booking 
-          }
-        });
-      }
-    } catch (error) {
-      alert(error.message || "Failed to create booking. Please try again.");
-    } finally {
+    // Simulate a brief local validation/prep delay for better UX
+    setTimeout(() => {
+      navigate('/payment', { 
+        state: { 
+          event: event,
+          quantity: quantity
+        }
+      });
       setIsBooking(false);
-    }
+    }, 800);
   };
 
   const handleCancelBooking = async () => {
     if (!userBooking) return;
-    if (!window.confirm('Are you sure you want to cancel your existing booking?')) return;
+    setShowCancelModal(true);
+  };
 
+  const confirmCancellation = async () => {
     setIsCancelling(true);
     try {
       await cancelBooking(userBooking._id);
@@ -198,6 +192,16 @@ const BookingPage = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={confirmCancellation}
+        title="Cancel Booking"
+        message="Are you sure you want to cancel your existing booking? This action cannot be undone."
+        confirmText="Yes, Cancel Booking"
+        cancelText="No, Keep It"
+      />
     </div>
   );
 };
