@@ -15,12 +15,12 @@ const ProtectedRoute = ({ children }) => {
           await authAPI.getProfile();
           setIsValid(true);
         } catch (error) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
           setIsValid(false);
         } finally {
           setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
     };
     checkToken();
