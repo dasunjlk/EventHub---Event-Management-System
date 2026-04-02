@@ -17,8 +17,15 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const payload = {
+      email: formData.email.trim(),
+      password: formData.password.trim()
+    };
+    console.log("Login payload:", payload);
+
     try {
-      const response = await authAPI.login(formData);
+      const response = await authAPI.login(payload);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify({
         _id: response.data._id,
@@ -28,6 +35,7 @@ const Login = () => {
       }));
       navigate('/dashboard');
     } catch (err) {
+      console.error("Login error:", err.response?.data);
       setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
