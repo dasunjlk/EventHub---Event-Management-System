@@ -1,262 +1,198 @@
-# EventHub — Event Management System
+# EventHub - Event Management System
 
-Event Management System is a full-stack web application designed to help users easily discover, explore, and book tickets for various events such as conferences, workshops, concerts, and exhibitions. The platform allows event organizers to create and manage events while providing users with a simple interface to browse event details and reserve tickets.
+EventHub is a full-stack event discovery and booking platform built with React, Vite, Express, and MongoDB. Users can browse events, register accounts, book tickets, and review their booking history, while organizers can create and manage their own events.
 
-This project demonstrates real-world web development concepts including user authentication, event management, ticket booking, and user dashboards. It is developed as a collaborative project using GitHub, where team members contribute to different modules such as authentication, event discovery, booking systems, and user dashboards.
+This repository currently contains:
 
-The system is built using modern web technologies with a structured frontend and backend architecture, making it scalable and easy to maintain. The goal of this project is to practice full-stack development, team collaboration, version control using GitHub, and building a practical event management platform.
+- A Vite + React frontend in the project root
+- An Express + MongoDB backend inside `backend/`
+- Seed data for local development and demos
 
-**Example events:**
+## Features
 
-* Tech conferences
-* Music concerts
-* Workshops
-* Exhibitions
-* University events
+- Browse public event listings and featured events
+- Search events by title and filter by category
+- View detailed event pages
+- Register and log in with JWT-based authentication
+- Choose between attendee and organizer accounts during signup
+- Book tickets through a simulated checkout flow
+- View booking history, totals, and upcoming events in a dashboard
+- Create, edit, and delete events as an organizer or admin
+- Restrict event management routes by role and ownership
 
-**User Actions:**
+## Tech Stack
 
-1. Browse events
-2. View event details
-3. Book tickets
-4. Receive confirmation
+- Frontend: React 18, React Router, Vite, Tailwind CSS, Axios
+- Backend: Node.js, Express, MongoDB, Mongoose, JSON Web Tokens
+- Authentication: JWT stored in `localStorage`
+- Database: MongoDB Atlas or local MongoDB
 
----
+## Project Structure
 
-## 1. Core System Modules
-
-### Module 1 — Authentication System
-
-Handles user accounts.
-**Functions:** Register, Login, Logout, Profile
-
-### Module 2 — Event Management Module
-
-Stores and displays events.
-**Functions:** Add events, Edit events, View details, Event listing
-
-### Module 3 — Event Discovery Module
-
-Helps users find events.
-**Functions:** Browse events, Filter by category, Search by event name
-
-### Module 4 — Ticket Booking Module
-
-Allows users to book tickets.
-**Functions:** Select ticket quantity, Confirm booking, Save booking in database
-
-### Module 5 — User Dashboard
-
-Shows user's activity.
-**Functions:** View booked events, Booking history, Booking status
-
----
-
-## 2. System Workflow
-
-**User Flow:**
-
-```
-Home Page
-   ↓
-Browse Events
-   ↓
-View Event Details
-   ↓
-Book Ticket
-   ↓
-Booking Confirmation
-   ↓
-View Booking in Dashboard
+```text
+EventHub---Event-Management-System/
+|-- backend/
+|   |-- config/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   |-- package.json
+|   |-- seed.js
+|   `-- server.js
+|-- public/
+|-- src/
+|   |-- components/
+|   |-- pages/
+|   |   `-- Dashboard/
+|   `-- services/
+|-- index.html
+|-- package.json
+`-- README.md
 ```
 
-**Organizer Flow:**
+## Prerequisites
 
-```
-Login
-   ↓
-Create Event
-   ↓
-Manage Events
-   ↓
-View Bookings
-```
+- Node.js 18 or newer
+- npm
+- A MongoDB connection string
 
----
+## Getting Started
 
-## 3. Responsibilities for Each Member (5 Members)
+### 1. Install dependencies
 
-### Member 1 — Authentication & User System
+Install the frontend/root dependencies:
 
-**Responsibilities:**
-
-* User registration, Login/Logout, Password validation, Profile
-
-**Pages:** Login, Register, Profile
-
-**Backend:** User API, Authentication middleware
-
-### Member 2 — Event Creation & Management
-
-**Responsibilities:**
-
-* Create, Edit, Delete events, Database management
-
-**Pages:** Create Event, Manage Events
-
-**Database Tables:** `events`, `event_categories`
-
-### Member 3 — Event Discovery / Listing
-
-**Responsibilities:**
-
-* Display events, Search & Filter, Event cards UI
-
-**Pages:** Home, Event Listing, Event Details
-
-### Member 4 — Ticket Booking System
-
-**Responsibilities:**
-
-* Booking logic, Ticket selection, Booking confirmation
-
-**Pages:** Booking, Confirmation
-
-**Database Tables:** `bookings`, `tickets`
-
-### Member 5 — User Dashboard & Booking History
-
-**Responsibilities:**
-
-* Dashboard, View booked events, Booking history, Cancel booking
-
-**Pages:** Dashboard, My Bookings
-
----
-
-## 4. Simplified Database Structure
-
-**Users**
-
-```
-user_id
-name
-email
-password
-role
+```bash
+npm install
 ```
 
-**Events**
+Install the backend dependencies:
 
-```
-event_id
-title
-description
-date
-location
-category
-ticket_price
-available_tickets
+```bash
+cd backend
+npm install
+cd ..
 ```
 
-**Bookings**
+### 2. Configure environment variables
 
-```
-booking_id
-user_id
-event_id
-ticket_quantity
-total_price
-booking_date
-```
+Create `backend/.env` with the following values:
 
-**Categories**
-
-```
-category_id
-category_name
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+PORT=5000
 ```
 
----
+`backend/server.js` always loads `backend/.env`, so keep the backend environment file inside the `backend` folder.
 
-## 5. GitHub Repository Structure
+### 3. Start the backend API
 
-```
-event-management-system
-│
-├── README.md
-├── CONTRIBUTING.md
-├── .gitignore
-│
-├── docs
-│   ├── system-architecture.md
-│   └── database-design.md
-│
-├── frontend
-│   ├── public
-│   └── src
-│       ├── components
-│       │   ├── EventCard
-│       │   ├── Navbar
-│       │   ├── BookingForm
-│       │   └── Footer
-│       │
-│       ├── pages
-│       │   ├── Home
-│       │   ├── Login
-│       │   ├── Register
-│       │   ├── Events
-│       │   ├── EventDetails
-│       │   ├── Dashboard
-│       │   └── CreateEvent
-│       │
-│       └── services
-│           └── api.js
-│
-├── backend
-│   ├── controllers
-│   │   ├── authController.js
-│   │   ├── eventController.js
-│   │   └── bookingController.js
-│   │
-│   ├── models
-│   │   ├── User.js
-│   │   ├── Event.js
-│   │   └── Booking.js
-│   │
-│   ├── routes
-│   │   ├── authRoutes.js
-│   │   ├── eventRoutes.js
-│   │   └── bookingRoutes.js
-│   │
-│   ├── middleware
-│   │   └── authMiddleware.js
-│   │
-│   └── server.js
-│
-└── database
-    └── schema.md
+From the project root:
+
+```bash
+npm start
 ```
 
----
+Or from the backend folder:
 
-## 6. GitHub Branch Strategy
-
-**Main Branches:**
-
-```
-main
-develop
+```bash
+cd backend
+npm start
 ```
 
-**Feature Branches:**
+The API runs on `http://localhost:5000` by default.
 
+### 4. Start the frontend
+
+In a second terminal, from the project root:
+
+```bash
+npm run dev
 ```
-feature/auth-system
-feature/event-management
-feature/event-listing
-feature/ticket-booking
-feature/user-dashboard
+
+Vite usually serves the frontend at `http://localhost:5173`.
+
+## Seed Demo Data
+
+To populate the database with sample users and events:
+
+```bash
+cd backend
+node seed.js
 ```
 
+Important:
 
+- The seed script clears existing users and events before inserting demo data
+- It creates 8 sample events
+- It creates one admin account for local testing:
+
+```text
+Email: test@example.com
+Password: password123
+Role: admin
+```
+
+## Roles
+
+- `user`: browse events, book tickets, view dashboard
+- `organizer`: all user actions plus create and manage their own events
+- `admin`: organizer permissions plus permission to manage any event
+
+## API Overview
+
+Base URL:
+
+```text
+http://localhost:5000/api
+```
+
+Main routes:
+
+- `POST /auth/register` - create a new account
+- `POST /auth/login` - authenticate and receive a token
+- `GET /auth/profile` - fetch the logged-in user profile
+- `PUT /auth/profile` - update name, email, or password
+- `GET /events` - fetch all events
+- `GET /events/:id` - fetch one event
+- `GET /events/my-events` - fetch events created by the logged-in organizer/admin
+- `POST /events` - create an event
+- `PUT /events/:id` - update an event
+- `DELETE /events/:id` - delete an event
+- `POST /bookings` - create a booking
+- `GET /bookings/user` - fetch current user bookings
+- `DELETE /bookings/:bookingId` - cancel a booking
+
+## Available Commands
+
+From the project root:
+
+```bash
+npm run dev      # start the Vite frontend
+npm start        # start the backend server
+npm run build    # build the frontend for production
+npm run preview  # preview the production frontend build
+```
+
+From `backend/`:
+
+```bash
+npm start        # start the backend server
+node seed.js     # seed sample data
+```
+
+## Development Notes
+
+- The frontend API base URL is currently hardcoded to `http://localhost:5000/api`
+- If you change the backend port, also update the frontend service configuration in `src/services/api.js` and `src/services/eventService.js`
+- The checkout screen is a simulated payment flow for demo purposes; no external payment gateway is integrated yet
+
+## Future Improvements
+
+- Move API URLs to environment variables
+- Add backend hot reload with a local `nodemon` dependency
+- Add automated tests for frontend and backend flows
+- Integrate a real payment provider
+- Add image upload support instead of URL-only event images
