@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import { eventAPI } from '../services/api'
-import { cancelBooking, getUserBookings } from '../services/bookingService'
+import { cancelBooking, getUserBookings, updateBooking } from '../services/bookingService'
+import ConfirmModal from '../components/ConfirmModal'
+import AlertModal from '../components/AlertModal'
+import Toast from '../components/Toast'
+import TicketQuantitySelector from '../components/TicketQuantitySelector'
 
 const FALLBACK_EVENT_IMAGE = '/event-fallback.svg'
 
@@ -37,6 +41,12 @@ const EventDetails = () => {
   const [userBooking, setUserBooking] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isCancelling, setIsCancelling] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [alertInfo, setAlertInfo] = useState({ isOpen: false, message: '', type: 'primary', title: 'Notification' })
+  const [isAdjusting, setIsAdjusting] = useState(false)
+  const [adjustQuantity, setAdjustQuantity] = useState(1)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [toast, setToast] = useState(null)
   const [heroImageSrc, setHeroImageSrc] = useState(FALLBACK_EVENT_IMAGE)
   const [reloadCount, setReloadCount] = useState(0)
   const [error, setError] = useState('')
@@ -64,7 +74,7 @@ const EventDetails = () => {
         if (Array.isArray(bookings) && bookings.length > 0) {
           const existingBooking = bookings.find((booking) => {
             const bookingEventId = booking.event_id?._id || booking.event_id
-            return String(bookingEventId) === String(id)
+            return String(bookingEventId) === String(id) && booking.status === 'active'
           })
 
           setUserBooking(existingBooking || null)
@@ -86,10 +96,12 @@ const EventDetails = () => {
     fetchEventData()
   }, [id, reloadCount])
 
-  const handleCancelBooking = async () => {
+  const handleCancelBooking = () => {
     if (!userBooking) return
-    if (!window.confirm('Are you sure you want to cancel this booking?')) return
+    setShowCancelModal(true)
+  }
 
+  const confirmCancellation = async () => {
     setIsCancelling(true)
     try {
       await cancelBooking(userBooking._id)
@@ -99,11 +111,64 @@ const EventDetails = () => {
         seats: Number(prev?.seats || 0) + Number(userBooking.ticket_quantity || 0),
       }))
       setUserBooking(null)
-      alert('Booking cancelled successfully')
+      setToast({ message: 'Booking cancelled successfully', type: 'success' })
     } catch (err) {
-      alert(err.message || 'Error occurred while cancelling booking')
+      setToast({ message: err.message || 'Error occurred while cancelling booking', type: 'error' })
     } finally {
       setIsCancelling(false)
+      setShowCancelModal(false)
+    }
+  }
+
+  const confirmAdjustment = async () => {
+    if (adjustQuantity === userBooking.ticket_quantity) {
+      setIsAdjusting(false)
+      return
+    }
+    
+    const diff = adjustQuantity - userBooking.ticket_quantity
+    if (diff > 0 && Number(currentEvent.seats) < diff) {
+      setToast({ message: `Only ${currentEvent.seats} more tickets available.`, type: 'error' })
+      return
+    }
+
+    if (diff > 0) {
+      // Proceed to top-up payment checkout
+      navigate('/payment', {
+        state: {
+          event: currentEvent,
+          quantity: diff, // Top up delta
+          isUpdate: true,
+          bookingId: userBooking._id,
+          targetQuantity: adjustQuantity
+        }
+      })
+      return
+    }
+
+    // Refund logic (diff < 0)
+    setIsUpdating(true)
+    try {
+      const updated = await updateBooking(userBooking._id, adjustQuantity)
+      
+      setCurrentEvent((prev) => ({
+        ...prev,
+        seats: Number(prev?.seats || 0) - diff
+      }))
+      setUserBooking(updated.booking)
+      setIsAdjusting(false)
+      
+      // User requirements explicitly asked for a popup refund response!
+      setAlertInfo({ 
+        isOpen: true, 
+        message: `Refunded to account.\n\nSuccessfully removed ${Math.abs(diff)} ticket(s). The refunded amount will be processed shortly.`,
+        type: 'primary',
+        title: 'Refund Successful'
+      })
+    } catch (err) {
+      setToast({ message: err.message || 'Error occurred while updating booking', type: 'error' })
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -328,28 +393,65 @@ const EventDetails = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <button
-                  id="book-ticket-btn"
-                  onClick={() => navigate(`/book/${id}`)}
-                  className="glass-btn w-full text-base py-3.5 shadow-lg"
-                >
-                  Book Ticket
-                </button>
-
-                {userBooking && (
+                {!userBooking ? (
                   <button
-                    id="cancel-booking-btn"
-                    onClick={handleCancelBooking}
-                    disabled={isCancelling}
-                    className="glass-btn w-full text-base py-3.5 border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] flex items-center justify-center gap-2"
+                    id="book-ticket-btn"
+                    onClick={() => navigate(`/book/${id}`)}
+                    className="glass-btn w-full text-base py-3.5 shadow-lg"
                   >
-                    {isCancelling ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        Cancelling...
-                      </>
-                    ) : 'Cancel Booking'}
+                    Book Ticket
                   </button>
+                ) : (
+                  <div className="glass-panel p-5 mt-2 border-primary-500/30 shadow-inner">
+                    <h3 className="text-lg font-bold text-white mb-2">Your Booking</h3>
+                    <p className="text-gray-300 mb-5">You currently have {userBooking.ticket_quantity} tickets.</p>
+
+                    {isAdjusting ? (
+                      <div className="space-y-4">
+                        <TicketQuantitySelector quantity={adjustQuantity} setQuantity={setAdjustQuantity} />
+                        <div className="flex gap-3 mt-4">
+                          <button
+                            onClick={() => setIsAdjusting(false)}
+                            className="glass-btn flex-1 py-3 text-sm border-white/20 text-gray-300 hover:text-white bg-white/5"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={confirmAdjustment}
+                            disabled={isUpdating}
+                            className="glass-btn flex-1 py-3 text-sm shadow-lg border-primary-500/50"
+                          >
+                            {isUpdating ? 'Saving...' : 'Save Update'}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        <button
+                          onClick={() => {
+                            setAdjustQuantity(userBooking.ticket_quantity)
+                            setIsAdjusting(true)
+                          }}
+                          className="glass-btn w-full text-base py-3 bg-white/10 hover:bg-white/20"
+                        >
+                          Adjust Ticket Count
+                        </button>
+                        <button
+                          id="cancel-booking-btn"
+                          onClick={handleCancelBooking}
+                          disabled={isCancelling}
+                          className="glass-btn w-full text-base py-3.5 border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] flex items-center justify-center gap-2"
+                        >
+                          {isCancelling ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                              Cancelling...
+                            </>
+                          ) : 'Cancel Booking'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -369,6 +471,30 @@ const EventDetails = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={confirmCancellation}
+        title="Cancel Booking"
+        message="Are you sure you want to cancel this booking? This action cannot be undone."
+        confirmText="Yes, Cancel Booking"
+        cancelText="No, Keep It"
+      />
+
+      <AlertModal
+        isOpen={alertInfo.isOpen}
+        onClose={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+        {...alertInfo}
+      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }
