@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
 import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 import { createBooking, getUserBookings, cancelBooking } from '../services/bookingService';
 import { eventAPI } from '../services/api';
 
@@ -15,6 +16,7 @@ const BookingPage = () => {
   const [isBooking, setIsBooking] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -30,7 +32,7 @@ const BookingPage = () => {
         const token = localStorage.getItem('token');
         if (token) {
           const bookings = await getUserBookings();
-          const existing = bookings.find((b) => (b.event_id?._id || b.event_id) === eventId);
+          const existing = bookings.find((b) => (b.event_id?._id || b.event_id) === eventId && b.status === 'active');
           setUserBooking(existing);
         }
       } catch (err) {
@@ -72,7 +74,7 @@ const BookingPage = () => {
 
   const handleConfirmBooking = async () => {
     if (quantity > event.seats) {
-      alert(`Only ${event.seats} tickets available.`);
+      setToast({ message: `Only ${event.seats} tickets available.`, type: 'error' });
       return;
     }
 
@@ -105,9 +107,11 @@ const BookingPage = () => {
         seats: prev.seats + userBooking.ticket_quantity
       }));
       setUserBooking(null);
-      alert('Booking cancelled successfully');
+      setShowCancelModal(false);
+      setToast({ message: 'Booking cancelled successfully', type: 'success' });
     } catch (err) {
-      alert(err.message || 'Error occurred while cancelling booking');
+      setShowCancelModal(false);
+      setToast({ message: err.message || 'Error occurred while cancelling booking', type: 'error' });
     } finally {
       setIsCancelling(false);
     }
@@ -202,6 +206,14 @@ const BookingPage = () => {
         confirmText="Yes, Cancel Booking"
         cancelText="No, Keep It"
       />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

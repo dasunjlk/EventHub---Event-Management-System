@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import eventService from '../services/eventService';
+import ConfirmModal from '../components/ConfirmModal';
+import AlertModal from '../components/AlertModal';
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -9,6 +11,10 @@ const ManageEvents = () => {
 
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+
+  const [deleteId, setDeleteId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({ isOpen: false, message: '', type: 'danger', title: 'Error' });
 
   const categories = ['Music', 'Tech', 'Art', 'Education', 'Workshop'];
 
@@ -35,14 +41,19 @@ const ManageEvents = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      try {
-        await eventService.deleteEvent(id);
-        setEvents(events.filter(event => event.id !== id));
-      } catch (err) {
-        alert(err.message);
-      }
+  const requestDelete = (id) => {
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await eventService.deleteEvent(deleteId);
+      setEvents(events.filter(event => event.id !== deleteId));
+      setDeleteId(null);
+    } catch (err) {
+      setAlertInfo({ isOpen: true, message: err.message, type: 'danger', title: 'Error' });
     }
   };
 
@@ -89,7 +100,7 @@ const ManageEvents = () => {
       setEvents(events.map(event => event.id === editingId ? formattedUpdatedEvent : event));
       setEditingId(null);
     } catch (err) {
-      alert(err.message);
+      setAlertInfo({ isOpen: true, message: err.message, type: 'danger', title: 'Error' });
     }
   };
 
@@ -229,7 +240,7 @@ const ManageEvents = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(event.id)}
+                        onClick={() => requestDelete(event.id)}
                         className="flex-1 glass-btn text-white border-red-500/50 hover:bg-red-500/20 shadow-sm"
                       >
                         Delete
@@ -242,6 +253,21 @@ const ManageEvents = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Event"
+        message="Are you sure you want to delete this event?"
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+      />
+      <AlertModal
+        isOpen={alertInfo.isOpen}
+        onClose={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+        {...alertInfo}
+      />
     </div>
   );
 };

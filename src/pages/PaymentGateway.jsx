@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { createBooking } from '../services/bookingService';
+import { createBooking, updateBooking } from '../services/bookingService';
+import AlertModal from '../components/AlertModal';
 
 const PaymentGateway = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { event, quantity } = location.state || {};
+  const { event, quantity, isUpdate, bookingId, targetQuantity } = location.state || {};
 
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -13,12 +14,14 @@ const PaymentGateway = () => {
   const [name, setName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentStep, setPaymentStep] = useState('input'); // 'input', 'verifying', 'success'
+  const [alertInfo, setAlertInfo] = useState({ isOpen: false, message: '' });
 
   if (!event || !quantity) {
     return <Navigate to="/events" replace />;
   }
 
-  const totalPrice = event.price * quantity;
+  const numericPrice = Number(event.price || event.ticket_price || 0);
+  const totalPrice = numericPrice * quantity;
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -28,12 +31,16 @@ const PaymentGateway = () => {
     // Simulate network delay for payment verification
     setTimeout(async () => {
       try {
-        const bookingData = {
-          event_id: event._id || event.id,
-          ticket_quantity: quantity
-        };
-
-        const response = await createBooking(bookingData);
+        let response;
+        if (isUpdate) {
+            response = await updateBooking(bookingId, targetQuantity);
+        } else {
+            const bookingData = {
+              event_id: event._id || event.id,
+              ticket_quantity: quantity
+            };
+            response = await createBooking(bookingData);
+        }
 
         if (response.success) {
           setPaymentStep('success');
@@ -46,7 +53,7 @@ const PaymentGateway = () => {
           }, 1500);
         }
       } catch (error) {
-        alert(error.message || "Payment processing failed. Please try again.");
+        setAlertInfo({ isOpen: true, message: error.message || "Payment processing failed. Please try again." });
         setPaymentStep('input');
         setIsProcessing(false);
       }
@@ -119,12 +126,12 @@ const PaymentGateway = () => {
                   <span className="text-white font-medium truncate max-w-[150px]">{event.title}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Tickets</span>
+                  <span className="text-gray-400">{isUpdate ? 'Additional Tickets' : 'Tickets'}</span>
                   <span className="text-white font-medium">x {quantity}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Price per ticket</span>
-                  <span className="text-white font-medium">Rs {event.price.toLocaleString()}</span>
+                  <span className="text-white font-medium">Rs {numericPrice.toLocaleString()}</span>
                 </div>
                 <div className="pt-4 border-t border-white/10 flex justify-between items-center">
                   <span className="text-white font-bold">Total Amount</span>
@@ -221,6 +228,13 @@ const PaymentGateway = () => {
         </svg>
         Back to booking
       </button>
+      <AlertModal
+        isOpen={alertInfo.isOpen}
+        onClose={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+        message={alertInfo.message}
+        type="danger"
+        title="Payment Failed"
+      />
     </div>
   );
 };
