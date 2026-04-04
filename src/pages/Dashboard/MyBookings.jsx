@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../components/ConfirmModal';
-import { getUserBookings, cancelBooking } from '../../services/bookingService';
+import AlertModal from '../../components/AlertModal';
+import TicketQuantitySelector from '../../components/TicketQuantitySelector';
+import { getUserBookings, cancelBooking, updateBooking } from '../../services/bookingService';
 
 const statusColors = {
   Confirmed: 'border-green-500/30 text-green-200 bg-green-500/10',
@@ -16,6 +18,11 @@ export default function MyBookings() {
   const [cancellingId, setCancellingId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [alertInfo, setAlertInfo] = useState({ isOpen: false, message: '', type: 'danger', title: 'Error' });
+  const [adjustingId, setAdjustingId] = useState(null);
+  const [adjustQuantity, setAdjustQuantity] = useState(1);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBookings();
@@ -48,12 +55,63 @@ export default function MyBookings() {
       await cancelBooking(id);
       setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== id));
     } catch (err) {
-      alert(err.message || 'Error occurred while cancelling booking');
+      setAlertInfo({ isOpen: true, message: err.message || 'Error occurred while cancelling booking', type: 'danger', title: 'Cancellation Failed' });
     } finally {
       setCancellingId(null);
     }
   };
 
+<<<<<<< HEAD
+=======
+  const confirmAdjustment = async (booking) => {
+    if (adjustQuantity === booking.ticket_quantity) {
+      setAdjustingId(null)
+      return
+    }
+    
+    const diff = adjustQuantity - booking.ticket_quantity
+    const currentEvent = booking.event_id;
+    
+    if (diff > 0 && Number(currentEvent.available_tickets) < diff) {
+      setAlertInfo({ isOpen: true, message: `Only ${currentEvent.available_tickets} more tickets available.`, type: 'danger', title: 'Action Failed' })
+      return
+    }
+
+    if (diff > 0) {
+      navigate('/payment', {
+        state: {
+          event: { ...currentEvent, price: currentEvent.ticket_price }, 
+          quantity: diff, 
+          isUpdate: true,
+          bookingId: booking._id,
+          targetQuantity: adjustQuantity
+        }
+      })
+      return
+    }
+
+    setIsUpdating(true)
+    try {
+      const updated = await updateBooking(booking._id, adjustQuantity)
+      
+      setBookings(prev => prev.map(b => b._id === booking._id ? updated.booking : b))
+      setAdjustingId(null)
+      
+      setAlertInfo({ 
+        isOpen: true, 
+        message: `Refunded to account.\n\nSuccessfully removed ${Math.abs(diff)} ticket(s). The refunded amount will be processed shortly.`,
+        type: 'primary',
+        title: 'Refund Successful'
+      })
+    } catch (err) {
+      setAlertInfo({ isOpen: true, message: err.message || 'Error occurred while updating booking', type: 'danger', title: 'Update Failed' })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  // Helper function to safely render dates
+>>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -119,9 +177,9 @@ export default function MyBookings() {
                   <div key={booking._id} className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:items-center relative shadow-2xl border-white/20">
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
-                        <h2 className="text-2xl font-bold text-white drop-shadow-sm">
+                        <Link to={`/events/${eventData._id || eventData.id}`} className="text-2xl font-bold text-white drop-shadow-sm hover:text-primary-400 transition-colors">
                           {eventData.title || 'Event Details Unavailable'}
-                        </h2>
+                        </Link>
                         <span className={`glass-badge ${statusClass}`}>
                           {statusLabel}
                         </span>
@@ -173,6 +231,7 @@ export default function MyBookings() {
                       </div>
                     </div>
 
+<<<<<<< HEAD
                     <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center">
                       <button
                         onClick={() => handleCancelBooking(booking._id)}
@@ -186,6 +245,61 @@ export default function MyBookings() {
                           </>
                         ) : 'Cancel Booking'}
                       </button>
+=======
+                    {/* Actions (Update & Cancel) */}
+                    <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center gap-3 w-full md:w-auto h-full items-stretch">
+                      {booking.status === 'active' || booking.status === 'confirmed' || !booking.status ? (
+                        <>
+                          {adjustingId === booking._id ? (
+                            <div className="space-y-3 glass-panel p-3 border-primary-500/30">
+                              <TicketQuantitySelector quantity={adjustQuantity} setQuantity={setAdjustQuantity} />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setAdjustingId(null)}
+                                  className="glass-btn flex-1 py-2 text-xs border-white/20 text-gray-300 hover:text-white bg-white/5"
+                                >
+                                  Close
+                                </button>
+                                <button
+                                  onClick={() => confirmAdjustment(booking)}
+                                  disabled={isUpdating}
+                                  className="glass-btn flex-1 py-2 text-xs shadow-[0_0_10px_rgba(59,130,246,0.3)] border-primary-500/50 text-primary-200"
+                                >
+                                  {isUpdating ? 'Wait...' : 'Save'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setAdjustQuantity(booking.ticket_quantity);
+                                setAdjustingId(booking._id);
+                              }}
+                              className="w-full md:w-auto px-6 py-3 glass-btn border-primary-500/30 text-primary-200 bg-primary-500/10 hover:bg-primary-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] flex items-center justify-center gap-2"
+                            >
+                              Adjust Tickets
+                            </button>
+                          )}
+
+                          {adjustingId !== booking._id && (
+                            <button
+                              onClick={() => handleCancelBooking(booking._id)}
+                              disabled={cancellingId === booking._id}
+                              className="w-full md:w-auto px-6 py-3 glass-btn border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2"
+                            >
+                              {cancellingId === booking._id ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                  Cancelling...
+                                </>
+                              ) : 'Cancel Booking'}
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-gray-500 text-sm italic py-2 text-center h-full flex items-center opacity-60">Status Cancelled</span>
+                      )}
+>>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
                     </div>
                   </div>
                 );
@@ -203,6 +317,11 @@ export default function MyBookings() {
         message="Are you sure you want to cancel this booking? This will remove your reservation for the event."
         confirmText="Yes, Cancel Booking"
         cancelText="No, Keep It"
+      />
+      <AlertModal
+        isOpen={alertInfo.isOpen}
+        onClose={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+        {...alertInfo}
       />
     </>
   );

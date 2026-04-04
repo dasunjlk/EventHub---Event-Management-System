@@ -38,3 +38,13 @@ export const cancelBooking = async (bookingId) => {
     throw new Error(error.response?.data?.message || "Failed to cancel booking");
   }
 };
+
+export const updateBooking = async (bookingId, new_ticket_quantity) => {
+  try {
+    const response = await api.put(`/bookings/${bookingId}`, { new_ticket_quantity });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating booking:", error);
+    throw new Error(error.response?.data?.message || "Failed to update booking");
+  }
+};
