@@ -21,14 +21,8 @@ export const createBooking = async (req, res) => {
     }
 
     const total_price = event.ticket_price * ticket_quantity;
-    // Check for an existing active booking from the same user for this event.
+    // Reuse the active booking so users can add tickets in multiple purchases.
     const existingBooking = await Booking.findOne({ user_id, event_id, status: 'active' });
-    if (existingBooking) {
-      return res.status(400).json({ success: false, message: 'You already have an active booking for this event.' });
-    }
-
-    // Generate a unique bookingId using uuid.
-    const bookingId = uuidv4();
 
     const updatedEvent = await Event.findOneAndUpdate(
       { _id: event_id, available_tickets: { $gte: ticket_quantity } },
@@ -39,6 +33,21 @@ export const createBooking = async (req, res) => {
     if (!updatedEvent) {
       return res.status(400).json({ success: false, message: 'Could not secure tickets. Please try again.' });
     }
+
+    if (existingBooking) {
+      existingBooking.ticket_quantity += ticket_quantity;
+      existingBooking.total_price += total_price;
+
+      const savedBooking = await existingBooking.save();
+      return res.status(200).json({
+        success: true,
+        message: 'Tickets added to your existing booking successfully',
+        booking: savedBooking
+      });
+    }
+
+    // Generate a unique bookingId using uuid.
+    const bookingId = uuidv4();
 
     const booking = new Booking({
       user_id,
