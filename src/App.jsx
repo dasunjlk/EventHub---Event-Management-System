@@ -47,12 +47,12 @@ function App() {
             <Route path="/events/:id" element={<EventDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/create-event" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+            <Route path="/create-event" element={<ProtectedRoute allowedRoles={['organizer', 'admin']}><CreateEvent /></ProtectedRoute>} />
             <Route path="/book/:eventId" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
             <Route path="/payment" element={<ProtectedRoute><PaymentGateway /></ProtectedRoute>} />
             <Route path="/booking-success" element={<ProtectedRoute><BookingSuccess /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/manage-events" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />
+            <Route path="/manage-events" element={<ProtectedRoute allowedRoles={['organizer', 'admin']}><ManageEvents /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
           </Routes>

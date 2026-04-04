@@ -38,6 +38,20 @@ const Home = () => {
       e.preventDefault()
       setAuthError('Please login to host events')
       setTimeout(() => setAuthError(''), 3000)
+      return
+    }
+
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+      if (currentUser.role !== 'organizer' && currentUser.role !== 'admin') {
+        e.preventDefault()
+        setAuthError('Only organizers or admins can create events')
+        setTimeout(() => setAuthError(''), 3000)
+      }
+    } catch {
+      e.preventDefault()
+      setAuthError('Please login again to continue')
+      setTimeout(() => setAuthError(''), 3000)
     }
   }
 

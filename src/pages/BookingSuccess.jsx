@@ -59,7 +59,7 @@ const BookingSuccess = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="glass-btn px-6 py-3 min-w-[160px]"
           >
             Go to Dashboard
