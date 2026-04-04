@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
-import ConfirmModal from '../components/ConfirmModal';
 import Toast from '../components/Toast';
-import { createBooking, getUserBookings, cancelBooking } from '../services/bookingService';
+import { getUserBookings } from '../services/bookingService';
 import { eventAPI } from '../services/api';
 
 const BookingPage = () => {
@@ -14,8 +13,6 @@ const BookingPage = () => {
   const [userBooking, setUserBooking] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,7 +25,6 @@ const BookingPage = () => {
         const data = await eventAPI.getEventById(eventId);
         setEvent(data);
 
-        // Check for existing user bookings if token exists
         const token = localStorage.getItem('token');
         if (token) {
           const bookings = await getUserBookings();
@@ -79,42 +75,25 @@ const BookingPage = () => {
     }
 
     setIsBooking(true);
-    // Simulate a brief local validation/prep delay for better UX
     setTimeout(() => {
+      const paymentState = userBooking
+        ? {
+            event,
+            quantity,
+            isUpdate: true,
+            bookingId: userBooking._id,
+            targetQuantity: Number(userBooking.ticket_quantity) + Number(quantity),
+          }
+        : {
+            event,
+            quantity,
+          };
+
       navigate('/payment', { 
-        state: { 
-          event: event,
-          quantity: quantity
-        }
+        state: paymentState
       });
       setIsBooking(false);
     }, 800);
-  };
-
-  const handleCancelBooking = async () => {
-    if (!userBooking) return;
-    setShowCancelModal(true);
-  };
-
-  const confirmCancellation = async () => {
-    setIsCancelling(true);
-    try {
-      await cancelBooking(userBooking._id);
-      
-      // Update local UI state
-      setEvent((prev) => ({
-        ...prev,
-        seats: prev.seats + userBooking.ticket_quantity
-      }));
-      setUserBooking(null);
-      setShowCancelModal(false);
-      setToast({ message: 'Booking cancelled successfully', type: 'success' });
-    } catch (err) {
-      setShowCancelModal(false);
-      setToast({ message: err.message || 'Error occurred while cancelling booking', type: 'error' });
-    } finally {
-      setIsCancelling(false);
-    }
   };
 
   const handleBack = () => {
@@ -125,8 +104,14 @@ const BookingPage = () => {
     <div className="max-w-3xl mx-auto px-4 py-12 min-h-[calc(100vh-140px)]">
       <div className="glass-panel overflow-hidden border-white/20 shadow-2xl">
         <div className="p-8">
-          <h1 className="text-3xl font-bold text-white drop-shadow-md mb-2">Book Tickets</h1>
-          <p className="text-gray-300 font-medium mb-8">Secure your spot for this amazing event</p>
+          <h1 className="text-3xl font-bold text-white drop-shadow-md mb-2">
+            {userBooking ? 'Book More Tickets' : 'Book Tickets'}
+          </h1>
+          <p className="text-gray-300 font-medium mb-8">
+            {userBooking
+              ? `You already have ${userBooking.ticket_quantity} ticket(s). Choose how many more you'd like to add.`
+              : 'Secure your spot for this amazing event'}
+          </p>
           
           <div className="glass-panel p-6 mb-8 shadow-inner bg-white/10 border-white/10">
             <h2 className="text-2xl font-bold text-white mb-4 drop-shadow-sm">{event.title}</h2>
@@ -149,38 +134,32 @@ const BookingPage = () => {
           </div>
 
           <div className="mb-8">
-            <h3 className="text-lg font-bold text-white mb-4 drop-shadow-sm">Select Tickets</h3>
+            <h3 className="text-lg font-bold text-white mb-4 drop-shadow-sm">
+              {userBooking ? 'Additional Tickets' : 'Select Tickets'}
+            </h3>
             <TicketQuantitySelector quantity={quantity} setQuantity={setQuantity} />
           </div>
 
           <BookingSummary price={event.price} quantity={quantity} />
 
+          {userBooking && (
+            <div className="glass-panel p-4 mb-6 bg-primary-500/5 border-primary-500/20 text-sm text-gray-200">
+              Your existing booking stays active. This checkout will add more tickets to the same reservation.
+              Manage cancellations from My Bookings in the dashboard.
+            </div>
+          )}
+
           <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-end mt-8 border-t border-white/20">
-            {userBooking && (
-              <button
-                onClick={handleCancelBooking}
-                disabled={isCancelling}
-                className="glass-btn px-6 py-3 border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)] flex items-center justify-center gap-2 sm:mr-auto"
-              >
-                {isCancelling ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Cancelling...
-                  </>
-                ) : 'Cancel Existing Booking'}
-              </button>
-            )}
-            
             <button
               onClick={handleBack}
-              disabled={isBooking || isCancelling}
+              disabled={isBooking}
               className="glass-btn px-6 py-3 min-w-[120px]"
             >
               Back
             </button>
             <button
               onClick={handleConfirmBooking}
-              disabled={isBooking || isCancelling}
+              disabled={isBooking}
               className="glass-btn px-8 py-3 min-w-[200px] shadow-lg"
             >
               {isBooking ? (
@@ -191,21 +170,11 @@ const BookingPage = () => {
                   </svg>
                   Processing...
                 </span>
-              ) : "Confirm Booking"}
+              ) : userBooking ? 'Continue to Payment' : 'Confirm Booking'}
             </button>
           </div>
         </div>
       </div>
-
-      <ConfirmModal
-        isOpen={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        onConfirm={confirmCancellation}
-        title="Cancel Booking"
-        message="Are you sure you want to cancel your existing booking? This action cannot be undone."
-        confirmText="Yes, Cancel Booking"
-        cancelText="No, Keep It"
-      />
 
       {toast && (
         <Toast

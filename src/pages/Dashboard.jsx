@@ -34,7 +34,7 @@ export default function Dashboard() {
     try {
       const parsed = JSON.parse(userData)
       setUserRole(parsed.role || '')
-    } catch (parseError) {
+    } catch {
       setUserRole('')
     }
   }, [])
