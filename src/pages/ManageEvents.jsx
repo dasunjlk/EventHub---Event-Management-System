@@ -48,7 +48,6 @@ const ManageEvents = () => {
 
   const startEdit = (event) => {
     setEditingId(event.id);
-    // Format date properly for the datetime-local input field
     let formattedDate = event.date || '';
     if (formattedDate.includes('Z')) {
       formattedDate = new Date(formattedDate).toISOString().slice(0, 16);
@@ -105,7 +104,6 @@ const ManageEvents = () => {
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
       <div className="w-full max-w-4xl space-y-8">
 
-        {/* Header Section */}
         <div className="text-center glass-panel shadow-2xl border-white/20 p-8">
           <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">Manage Events</h2>
           <p className="mt-3 text-lg text-gray-200">View, update, or remove events that you have created.</p>
@@ -118,7 +116,6 @@ const ManageEvents = () => {
         )}
 
         {!error && events.length === 0 ? (
-          /* Empty State */
           <div className="text-center p-12 glass-panel shadow-2xl border-white/20">
             <div className="text-5xl mb-4 drop-shadow-md">🗓️</div>
             <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No events available</h3>
@@ -126,7 +123,6 @@ const ManageEvents = () => {
             <Link to="/create-event" className="glass-btn inline-block">Create New Event</Link>
           </div>
         ) : (
-          /* Event List */
           <div className="space-y-6">
             {events.map((event) => (
               <div
@@ -134,7 +130,6 @@ const ManageEvents = () => {
                 className="glass-panel p-6 shadow-2xl transition-all duration-300 hover:border-white/30"
               >
                 {editingId === event.id ? (
-                  /* Inline Edit Form */
                   <form onSubmit={saveEdit} className="space-y-6 animate-fadeIn">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
 
@@ -189,7 +184,6 @@ const ManageEvents = () => {
                     </div>
                   </form>
                 ) : (
-                  /* Event Details Display */
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 animate-fadeIn">
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">

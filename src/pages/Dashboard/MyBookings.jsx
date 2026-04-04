@@ -46,7 +46,6 @@ export default function MyBookings() {
     try {
       setCancellingId(id);
       await cancelBooking(id);
-      // Remove the cancelled booking from the UI immediately
       setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== id));
     } catch (err) {
       alert(err.message || 'Error occurred while cancelling booking');
@@ -55,7 +54,6 @@ export default function MyBookings() {
     }
   };
 
-  // Helper function to safely render dates
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -112,7 +110,6 @@ export default function MyBookings() {
               {bookings.map((booking) => {
                 const eventData = booking.event_id || {};
 
-                // Determine status class based on booking status, default to Confirmed format
                 const statusLabel = booking.status
                   ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
                   : 'Confirmed';
@@ -120,7 +117,6 @@ export default function MyBookings() {
 
                 return (
                   <div key={booking._id} className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:items-center relative shadow-2xl border-white/20">
-                    {/* Event Details */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
                         <h2 className="text-2xl font-bold text-white drop-shadow-sm">
@@ -151,7 +147,6 @@ export default function MyBookings() {
                         )}
                       </div>
 
-                      {/* Booking Meta Information */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
                         <div>
                           <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Tickets</p>
@@ -178,7 +173,6 @@ export default function MyBookings() {
                       </div>
                     </div>
 
-                    {/* Actions (Cancel button) */}
                     <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center">
                       <button
                         onClick={() => handleCancelBooking(booking._id)}

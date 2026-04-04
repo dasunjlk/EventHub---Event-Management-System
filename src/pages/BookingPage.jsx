@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
 import ConfirmModal from '../components/ConfirmModal';
-import { createBooking, getUserBookings, cancelBooking } from '../services/bookingService';
+import { getUserBookings, cancelBooking } from '../services/bookingService';
 import { eventAPI } from '../services/api';
 
 const BookingPage = () => {
@@ -26,7 +26,6 @@ const BookingPage = () => {
         const data = await eventAPI.getEventById(eventId);
         setEvent(data);
 
-        // Check for existing user bookings if token exists
         const token = localStorage.getItem('token');
         if (token) {
           const bookings = await getUserBookings();
@@ -77,7 +76,6 @@ const BookingPage = () => {
     }
 
     setIsBooking(true);
-    // Simulate a brief local validation/prep delay for better UX
     setTimeout(() => {
       navigate('/payment', { 
         state: { 
@@ -98,8 +96,6 @@ const BookingPage = () => {
     setIsCancelling(true);
     try {
       await cancelBooking(userBooking._id);
-      
-      // Update local UI state
       setEvent((prev) => ({
         ...prev,
         seats: prev.seats + userBooking.ticket_quantity

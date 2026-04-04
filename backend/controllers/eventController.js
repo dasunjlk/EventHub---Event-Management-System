@@ -1,9 +1,7 @@
 import Event from '../models/Event.js';
 import mongoose from 'mongoose';
 
-// Helper for consistent error response formatting
 const handleErrorResponse = (res, error) => {
-  // Mongoose Validation Error
   if (error.name === 'ValidationError') {
     const messages = Object.values(error.errors).map(err => err.message);
     return res.status(400).json({
@@ -13,7 +11,6 @@ const handleErrorResponse = (res, error) => {
     });
   }
 
-  // Mongoose CastError (e.g., Invalid format for ObjectId)
   if (error.name === 'CastError') {
     return res.status(400).json({
       success: false,
@@ -22,7 +19,6 @@ const handleErrorResponse = (res, error) => {
     });
   }
 
-  // Mongoose Duplicate Key Error
   if (error.code === 11000) {
     const field = Object.keys(error.keyValue)[0];
     return res.status(400).json({
@@ -32,7 +28,6 @@ const handleErrorResponse = (res, error) => {
     });
   }
 
-  // Fallback for general server errors
   return res.status(500).json({
     success: false,
     message: 'Server Error',
@@ -40,7 +35,6 @@ const handleErrorResponse = (res, error) => {
   });
 };
 
-// 1. getAllEvents
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find();
@@ -54,7 +48,6 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-// 2. getEventById
 export const getEventById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,10 +80,8 @@ export const getEventById = async (req, res) => {
   }
 };
 
-// 3. createEvent
 export const createEvent = async (req, res) => {
   try {
-    // Explicit date validation to catch issues before DB layer
     if (req.body.date) {
       const parsedDate = new Date(req.body.date);
       if (isNaN(parsedDate.getTime()) || parsedDate <= new Date()) {
@@ -118,7 +109,6 @@ export const createEvent = async (req, res) => {
       });
     }
 
-    // Inject createdBy from the authenticated user
     const eventData = {
       ...req.body,
       createdBy: req.user?.userId || req.user?._id
@@ -137,7 +127,6 @@ export const createEvent = async (req, res) => {
   }
 };
 
-// 4. updateEvent
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -160,7 +149,6 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    // Ownership & Role Validation
     const userId = (req.user?.userId || req.user?._id || '').toString();
     const userRole = req.user?.role || '';
     if (event.createdBy.toString() !== userId && userRole !== 'admin') {
@@ -171,10 +159,8 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    // Prevent changing the creator maliciously
     delete req.body.createdBy;
 
-    // Strict validation edge cases (Partial Update Aware)
     if (req.body.date) {
       const parsedDate = new Date(req.body.date);
       if (isNaN(parsedDate.getTime()) || parsedDate <= new Date()) {
@@ -202,7 +188,6 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    // Partial update via $set handled natively by Mongoose with runValidators
     const updatedEvent = await Event.findByIdAndUpdate(
       id,
       { $set: req.body },
@@ -219,7 +204,6 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-// 5. deleteEvent
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -232,7 +216,6 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Checking if it exists first prevents "deleting an already deleted event"
     const event = await Event.findById(id);
 
     if (!event) {
@@ -243,7 +226,6 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Ownership & Role Validation
     const userId = (req.user?.userId || req.user?._id || '').toString();
     const userRole = req.user?.role || '';
     if (event.createdBy.toString() !== userId && userRole !== 'admin') {
@@ -254,7 +236,6 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Using the instance allows any attached middleware ('pre delete') to fire
     await event.deleteOne();
 
     res.status(200).json({
@@ -267,7 +248,6 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-// 6. getMyEvents
 export const getMyEvents = async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?._id;

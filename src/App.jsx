@@ -27,9 +27,7 @@ function App() {
       if (token) {
         try {
           await authAPI.getProfile()
-        } catch (error) {
-          // Global interceptor handles 401 redirect/cleanup
-        }
+        } catch {}
       }
     }
     validateToken()

@@ -11,24 +11,19 @@ import authRoutes from './routes/authRoutes.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Always load backend/.env, regardless of where node is started from
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// Connect to the database
 connectDB();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use('/api/events', eventRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/auth', authRoutes);
 
-// Base route for testing
 app.get('/', (req, res) => {
   res.send('EventHub API is running');
 });

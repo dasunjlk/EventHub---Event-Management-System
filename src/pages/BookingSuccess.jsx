@@ -7,7 +7,6 @@ const BookingSuccess = () => {
   const bookingDetails = location.state?.bookingDetails;
 
   if (!bookingDetails) {
-    // Redirect if a user lands here without a valid booking state
     return <Navigate to="/events" replace />;
   }
 

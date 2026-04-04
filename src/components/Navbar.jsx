@@ -22,7 +22,6 @@ const Navbar = () => {
     }
   }, [location])
 
-  // Close menus on route change
   useEffect(() => {
     setMenuOpen(false)
     setProfileOpen(false)
@@ -33,7 +32,6 @@ const Navbar = () => {
     localStorage.removeItem('user')
     navigate('/login')
   }
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileOpen && !e.target.closest('#profile-dropdown-container')) {
@@ -44,7 +42,6 @@ const Navbar = () => {
     return () => window.removeEventListener('click', handleClickOutside)
   }, [profileOpen])
 
-  // Add background on scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
@@ -66,7 +63,6 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg group-hover:bg-primary-500 transition-colors duration-200">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +74,6 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
@@ -88,7 +83,6 @@ const Navbar = () => {
                   <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
                 )}
                 <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
-                {/* Profile Dropdown */}
                 <div className="relative" id="profile-dropdown-container">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
@@ -147,7 +141,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Hamburger */}
           <button
             id="mobile-menu-toggle"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -170,7 +163,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           }`}
