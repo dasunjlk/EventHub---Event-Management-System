@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }) => {
         try {
           await authAPI.getProfile();
           setIsValid(true);
-        } catch (error) {
+        } catch {
           setIsValid(false);
         } finally {
           setLoading(false);

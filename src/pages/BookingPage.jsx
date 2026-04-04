@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import TicketQuantitySelector from '../components/TicketQuantitySelector';
 import BookingSummary from '../components/BookingSummary';
 import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast';
 import { getUserBookings, cancelBooking } from '../services/bookingService';
 import { eventAPI } from '../services/api';
 

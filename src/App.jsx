@@ -27,7 +27,9 @@ function App() {
       if (token) {
         try {
           await authAPI.getProfile()
-        } catch {}
+        } catch (error) {
+          console.error('Token validation failed:', error)
+        }
       }
     }
     validateToken()

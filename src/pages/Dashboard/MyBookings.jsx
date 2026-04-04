@@ -61,8 +61,6 @@ export default function MyBookings() {
     }
   };
 
-<<<<<<< HEAD
-=======
   const confirmAdjustment = async (booking) => {
     if (adjustQuantity === booking.ticket_quantity) {
       setAdjustingId(null)
@@ -111,7 +109,6 @@ export default function MyBookings() {
   }
 
   // Helper function to safely render dates
->>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -231,21 +228,6 @@ export default function MyBookings() {
                       </div>
                     </div>
 
-<<<<<<< HEAD
-                    <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center">
-                      <button
-                        onClick={() => handleCancelBooking(booking._id)}
-                        disabled={cancellingId === booking._id}
-                        className="w-full md:w-auto px-6 py-3 glass-btn border-red-500/40 text-red-200 bg-red-500/10 hover:bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.15)] flex items-center justify-center gap-2"
-                      >
-                        {cancellingId === booking._id ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            Cancelling...
-                          </>
-                        ) : 'Cancel Booking'}
-                      </button>
-=======
                     {/* Actions (Update & Cancel) */}
                     <div className="mt-4 md:mt-0 md:pl-6 md:border-l md:border-white/10 flex flex-col justify-center gap-3 w-full md:w-auto h-full items-stretch">
                       {booking.status === 'active' || booking.status === 'confirmed' || !booking.status ? (
@@ -299,7 +281,6 @@ export default function MyBookings() {
                       ) : (
                         <span className="text-gray-500 text-sm italic py-2 text-center h-full flex items-center opacity-60">Status Cancelled</span>
                       )}
->>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
                     </div>
                   </div>
                 );

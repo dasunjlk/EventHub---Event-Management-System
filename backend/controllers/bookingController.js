@@ -21,17 +21,13 @@ export const createBooking = async (req, res) => {
     }
 
     const total_price = event.ticket_price * ticket_quantity;
-<<<<<<< HEAD
-=======
-
-    // Check for existing active booking from the same user for this event
+    // Check for an existing active booking from the same user for this event.
     const existingBooking = await Booking.findOne({ user_id, event_id, status: 'active' });
     if (existingBooking) {
       return res.status(400).json({ success: false, message: 'You already have an active booking for this event.' });
     }
 
-    // Generate a unique bookingId using uuid
->>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
+    // Generate a unique bookingId using uuid.
     const bookingId = uuidv4();
 
     const updatedEvent = await Event.findOneAndUpdate(
@@ -91,26 +87,19 @@ export const cancelBooking = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized to cancel this booking' });
     }
 
-<<<<<<< HEAD
-=======
-    // Prevent double cancellation
+    // Prevent double cancellation.
     if (booking.status === 'cancelled') {
       return res.status(400).json({ success: false, message: 'Booking is already cancelled' });
     }
 
-    // Restore ticket availability atomically
->>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
+    // Restore ticket availability atomically.
     await Event.findByIdAndUpdate(booking.event_id, {
       $inc: { available_tickets: booking.ticket_quantity }
     });
 
-<<<<<<< HEAD
-    await Booking.findByIdAndDelete(bookingId);
-=======
-    // Soft update status
+    // Soft update status.
     booking.status = 'cancelled';
     await booking.save();
->>>>>>> 2df673fcf720fb673c883d9e493ff80f4d808b6c
 
     res.status(200).json({ success: true, message: 'Booking cancelled successfully' });
   } catch (error) {

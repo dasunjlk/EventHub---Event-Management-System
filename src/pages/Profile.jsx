@@ -18,37 +18,37 @@ const Profile = () => {
     newPassword: '',
   })
 
-  const fetchProfile = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      const response = await authAPI.getProfile()
-      const profileData = response.data
-      setUser(profileData)
-      setFormData((prev) => ({
-        ...prev,
-        name: profileData.name || '',
-        email: profileData.email || '',
-        currentPassword: '',
-        newPassword: '',
-      }))
-    } catch (err) {
-      const message = err.response?.data?.message || 'Failed to fetch profile'
-      setError(message)
-
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        navigate('/login')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true)
+        setError('')
+        const response = await authAPI.getProfile()
+        const profileData = response.data
+        setUser(profileData)
+        setFormData((prev) => ({
+          ...prev,
+          name: profileData.name || '',
+          email: profileData.email || '',
+          currentPassword: '',
+          newPassword: '',
+        }))
+      } catch (err) {
+        const message = err.response?.data?.message || 'Failed to fetch profile'
+        setError(message)
+
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          navigate('/login')
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchProfile()
-  }, [])
+  }, [navigate])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
