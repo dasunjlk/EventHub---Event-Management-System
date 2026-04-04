@@ -1,6 +1,13 @@
 import axios from 'axios';
+import { normalizeEventImageUrl } from '../utils/eventImages';
 
 const API_URL = 'http://localhost:5000/api/events';
+
+const mapEvent = (event) => ({
+  ...event,
+  id: event._id || event.id,
+  image: normalizeEventImageUrl(event.image)
+});
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -29,7 +36,8 @@ const eventService = {
   getEvents: async () => {
     try {
       const response = await axios.get(API_URL);
-      return response.data;
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data.map(mapEvent) : mapEvent(data);
     } catch (error) {
       handleError(error);
     }
@@ -38,7 +46,8 @@ const eventService = {
   getMyEvents: async () => {
     try {
       const response = await axios.get(`${API_URL}/my-events`, getAuthHeaders());
-      return response.data;
+      const data = response.data.data || response.data;
+      return Array.isArray(data) ? data.map(mapEvent) : [];
     } catch (error) {
       handleError(error);
     }
@@ -47,7 +56,8 @@ const eventService = {
   getEventById: async (id) => {
     try {
       const response = await axios.get(`${API_URL}/${id}`);
-      return response.data;
+      const data = response.data.data || response.data;
+      return mapEvent(data);
     } catch (error) {
       handleError(error);
     }
@@ -55,7 +65,10 @@ const eventService = {
 
   createEvent: async (data) => {
     try {
-      const response = await axios.post(API_URL, data, getAuthHeaders());
+      const response = await axios.post(API_URL, {
+        ...data,
+        image: normalizeEventImageUrl(data.image)
+      }, getAuthHeaders());
       return response.data;
     } catch (error) {
       handleError(error);
@@ -64,7 +77,10 @@ const eventService = {
 
   updateEvent: async (id, data) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, data, getAuthHeaders());
+      const response = await axios.put(`${API_URL}/${id}`, {
+        ...data,
+        image: normalizeEventImageUrl(data.image)
+      }, getAuthHeaders());
       return response.data;
     } catch (error) {
       handleError(error);

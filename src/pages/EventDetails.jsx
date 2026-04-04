@@ -3,8 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import { eventAPI } from '../services/api'
 import { getUserBookings } from '../services/bookingService'
-
-const FALLBACK_EVENT_IMAGE = '/event-fallback.svg'
+import { FALLBACK_EVENT_IMAGE, getEventImageUrl } from '../utils/eventImages'
 
 const categoryColors = {
   Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
@@ -57,7 +56,7 @@ const EventDetails = () => {
         ])
 
         setCurrentEvent(event)
-        setHeroImageSrc(event?.image || FALLBACK_EVENT_IMAGE)
+        setHeroImageSrc(getEventImageUrl(event?.image))
         setEvents(Array.isArray(allEvents) ? allEvents : [])
 
         if (Array.isArray(bookings) && bookings.length > 0) {
@@ -171,6 +170,7 @@ const EventDetails = () => {
             src={heroImageSrc}
             alt={displayTitle}
             className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
             onError={() => {
               if (heroImageSrc !== FALLBACK_EVENT_IMAGE) {
                 setHeroImageSrc(FALLBACK_EVENT_IMAGE)

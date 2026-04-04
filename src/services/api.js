@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { normalizeEventImageUrl } from '../utils/eventImages';
 
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
@@ -7,6 +8,7 @@ const api = axios.create({
 const mapEvent = (event) => ({
   ...event,
   id: event._id || event.id,
+  image: normalizeEventImageUrl(event.image),
   price: event.ticket_price,
   seats: event.available_tickets
 });
@@ -65,6 +67,7 @@ export const eventAPI = {
   createEvent: async (eventData) => {
     const res = await api.post('/events', {
       ...eventData,
+      image: normalizeEventImageUrl(eventData.image),
       ticket_price: Number(eventData.ticket_price),
       available_tickets: Number(eventData.available_tickets)
     });

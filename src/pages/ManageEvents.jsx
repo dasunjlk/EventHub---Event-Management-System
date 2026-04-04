@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import eventService from '../services/eventService';
 import ConfirmModal from '../components/ConfirmModal';
 import AlertModal from '../components/AlertModal';
+import { FALLBACK_EVENT_IMAGE, getEventImageUrl, normalizeEventImageUrl } from '../utils/eventImages';
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -25,14 +26,8 @@ const ManageEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await eventService.getMyEvents();
-      const data = res.data || res;
-
-      const formattedData = data.map(ev => ({
-        ...ev,
-        id: ev._id || ev.id
-      }));
-      setEvents(formattedData);
+      const data = await eventService.getMyEvents();
+      setEvents(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       setError(err.message || 'Could not load events. Please ensure the backend is running.');
@@ -93,6 +88,7 @@ const ManageEvents = () => {
 
       const formattedUpdatedEvent = {
         ...updatedEvent,
+        image: normalizeEventImageUrl(updatedEvent.image),
         id: updatedEvent._id || updatedEvent.id
       };
 
@@ -185,6 +181,26 @@ const ManageEvents = () => {
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL (Optional)</label>
                         <input type="url" name="image" value={editFormData.image || ''} onChange={handleEditChange} className="input-field w-full" />
+                        <p className="text-xs text-gray-500 mt-2">
+                          Use a direct image URL or a public Google Drive/Dropbox image link.
+                        </p>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <div className="glass-panel p-4 border-white/10">
+                          <p className="text-sm font-semibold text-gray-300 mb-3">Image Preview</p>
+                          <div className="overflow-hidden rounded-2xl border border-white/10 aspect-[16/9] bg-white/5">
+                            <img
+                              src={getEventImageUrl(editFormData.image)}
+                              alt={`${editFormData.title || 'Event'} preview`}
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                              onError={(e) => {
+                                e.currentTarget.src = FALLBACK_EVENT_IMAGE;
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                     </div>
@@ -196,6 +212,30 @@ const ManageEvents = () => {
                   </form>
                 ) : (
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 animate-fadeIn">
+                    <div className="w-full md:w-56 shrink-0">
+                      <div className="overflow-hidden rounded-2xl border border-white/10 aspect-[16/10] bg-white/5 shadow-inner">
+                        <img
+                          src={getEventImageUrl(event.image)}
+                          alt={event.title}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_EVENT_IMAGE;
+                          }}
+                        />
+                      </div>
+                      {event.image && (
+                        <a
+                          href={event.image}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex mt-3 text-xs text-primary-300 hover:text-primary-200 transition-colors"
+                        >
+                          Open image link
+                        </a>
+                      )}
+                    </div>
+
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <h3 className="text-2xl font-bold text-white">{event.title}</h3>

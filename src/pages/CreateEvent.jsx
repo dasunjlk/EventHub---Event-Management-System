@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import eventService from '../services/eventService';
+import { FALLBACK_EVENT_IMAGE, getEventImageUrl } from '../utils/eventImages';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const imagePreview = formData.image.trim() ? getEventImageUrl(formData.image) : FALLBACK_EVENT_IMAGE;
 
   const categories = ['Music', 'Tech', 'Art', 'Education', 'Workshop'];
 
@@ -201,6 +203,26 @@ const CreateEvent = () => {
                 className="input-field w-full"
                 placeholder="https://example.com/image.jpg"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                Use a direct image URL or a public Google Drive/Dropbox image link.
+              </p>
+            </div>
+
+            <div className="md:col-span-2">
+              <div className="glass-panel p-4 border-white/10">
+                <p className="text-sm font-semibold text-gray-300 mb-3">Image Preview</p>
+                <div className="overflow-hidden rounded-2xl border border-white/10 aspect-[16/9] bg-white/5">
+                  <img
+                    src={imagePreview}
+                    alt="Event preview"
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.src = FALLBACK_EVENT_IMAGE;
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
           </div>
