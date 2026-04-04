@@ -57,7 +57,6 @@ export default function MyBookings() {
     return (
         <div className="min-h-screen pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header Section */}
                 <header className="mb-12">
                     <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/40 border border-primary-700/40 text-primary-300 text-sm font-medium mb-5">
                         Reservations
@@ -87,7 +86,6 @@ export default function MyBookings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                         {bookings.map((booking) => (
                             <div key={booking._id} className="card group overflow-hidden border border-gray-800/50 hover:border-primary-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-500/5">
-                                {/* Event Image & Status */}
                                 <div className="relative aspect-[16/10] overflow-hidden">
                                     <img
                                         src={booking.event_id?.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1200&q=80'}

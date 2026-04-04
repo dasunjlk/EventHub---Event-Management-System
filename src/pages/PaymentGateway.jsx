@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { createBooking, updateBooking } from '../services/bookingService';
 import AlertModal from '../components/AlertModal';
@@ -28,7 +28,6 @@ const PaymentGateway = () => {
     setIsProcessing(true);
     setPaymentStep('verifying');
 
-    // Simulate network delay for payment verification
     setTimeout(async () => {
       try {
         let response;
@@ -111,7 +110,6 @@ const PaymentGateway = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Order Summary */}
           <div className="order-first md:order-last">
             <div className="glass-panel bg-white/5 p-6 border-white/10 h-full">
               <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2 border-b border-white/10 pb-3">
@@ -143,7 +141,6 @@ const PaymentGateway = () => {
             </div>
           </div>
 
-          {/* Payment Form */}
           <form onSubmit={handlePayment} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Cardholder Name</label>

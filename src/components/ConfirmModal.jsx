@@ -5,13 +5,11 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={onClose}
       />
-      
-      {/* Modal Content */}
+
       <div className="glass-panel w-full max-w-md overflow-hidden border-white/20 shadow-2xl animate-in zoom-in-95 duration-300 relative z-10">
         <div className="p-6 sm:p-8">
           <div className="flex items-center gap-4 mb-4">

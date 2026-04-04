@@ -1,18 +1,13 @@
-/**
- * Intersection Observer for scroll-based animations.
- * Adds 'is-visible' class to elements when they enter the viewport.
- */
 export const initAnimations = () => {
     const observerOptions = {
         root: null,
-        rootMargin: '0px 0px -50px 0px', // Reveal slightly after entering viewport
+        rootMargin: '0px 0px -50px 0px',
         threshold: 0.05 
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // console.log('Revealing element:', entry.target);
                 requestAnimationFrame(() => {
                     entry.target.classList.add('is-visible');
                 });
@@ -24,36 +19,30 @@ export const initAnimations = () => {
     const applyAnimationToElement = (el) => {
         if (el.classList.contains('reveal-on-scroll') || el.classList.contains('is-visible')) return;
 
-        // Comprehensive selectors for all major UI parts
         const selectors = 'section, .glass-panel, .card, .event-card, [class*="card"], .section-heading, .section-subheading, img, button, .footer-section, .nav-item';
         if (el.matches?.(selectors)) {
-            // console.log('Observing element:', el);
             el.classList.add('reveal-on-scroll');
             observer.observe(el);
         }
 
-        // Refined stagger for grid children
         if (el.parentElement && (el.parentElement.classList.contains('grid') || el.parentElement.className.includes('grid-cols'))) {
             const index = Array.from(el.parentElement.children).indexOf(el);
             if (index < 20) {
-                el.style.transitionDelay = `${index * 0.05}s`; // Refined stagger delay
+                el.style.transitionDelay = `${index * 0.05}s`;
             }
             el.classList.add('reveal-on-scroll');
             observer.observe(el);
         }
     };
 
-    // Initial scan
     const allRevealables = document.querySelectorAll('section, .glass-panel, .card, .event-card, [class*="card"], .section-heading, .section-subheading, img, button, .footer-section, .nav-item');
     allRevealables.forEach(el => applyAnimationToElement(el));
 
-    // Watch for new elements (React dynamic rendering)
     const mutationObserver = new MutationObserver((mutations) => {
         mutations.forEach(mutation => {
             mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1) { // Element node
+                if (node.nodeType === 1) {
                     applyAnimationToElement(node);
-                    // Also check children of the added node
                     const children = node.querySelectorAll?.('section, .glass-panel, .card, .event-card, [class*="card"], .section-heading, .section-subheading, img, button, .footer-section, .nav-item');
                     children?.forEach(child => applyAnimationToElement(child));
                 }
@@ -67,7 +56,6 @@ export const initAnimations = () => {
     });
 };
 
-// Auto-initialize
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
     initAnimations();
 } else {

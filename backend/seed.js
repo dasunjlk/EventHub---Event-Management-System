@@ -98,7 +98,6 @@ const seedDB = async () => {
     const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/eventhub');
     console.log(`Connected to MongoDB: ${conn.connection.host}`);
     
-    // Clear existing events to prevent duplicates, if you prefer not to clear them you can remove this
     await Event.deleteMany({});
     await User.deleteMany({});
     console.log('Cleared existing events and users');
@@ -110,7 +109,6 @@ const seedDB = async () => {
       role: 'admin'
     });
 
-    // Inject the test user ID into all dummy events to satisfy the 'createdBy' schema requirement
     const eventsWithCreator = events.map(e => ({
       ...e,
       createdBy: testUser._id

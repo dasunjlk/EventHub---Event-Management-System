@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import eventService from '../services/eventService';
 import ConfirmModal from '../components/ConfirmModal';
 import AlertModal from '../components/AlertModal';
+import { FALLBACK_EVENT_IMAGE, getEventImageUrl, normalizeEventImageUrl } from '../utils/eventImages';
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -25,14 +26,8 @@ const ManageEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await eventService.getMyEvents();
-      const data = res.data || res;
-
-      const formattedData = data.map(ev => ({
-        ...ev,
-        id: ev._id || ev.id
-      }));
-      setEvents(formattedData);
+      const data = await eventService.getMyEvents();
+      setEvents(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       setError(err.message || 'Could not load events. Please ensure the backend is running.');
@@ -59,7 +54,6 @@ const ManageEvents = () => {
 
   const startEdit = (event) => {
     setEditingId(event.id);
-    // Format date properly for the datetime-local input field
     let formattedDate = event.date || '';
     if (formattedDate.includes('Z')) {
       formattedDate = new Date(formattedDate).toISOString().slice(0, 16);
@@ -94,6 +88,7 @@ const ManageEvents = () => {
 
       const formattedUpdatedEvent = {
         ...updatedEvent,
+        image: normalizeEventImageUrl(updatedEvent.image),
         id: updatedEvent._id || updatedEvent.id
       };
 
@@ -116,7 +111,6 @@ const ManageEvents = () => {
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
       <div className="w-full max-w-4xl space-y-8">
 
-        {/* Header Section */}
         <div className="text-center glass-panel shadow-2xl border-white/20 p-8">
           <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">Manage Events</h2>
           <p className="mt-3 text-lg text-gray-200">View, update, or remove events that you have created.</p>
@@ -129,7 +123,6 @@ const ManageEvents = () => {
         )}
 
         {!error && events.length === 0 ? (
-          /* Empty State */
           <div className="text-center p-12 glass-panel shadow-2xl border-white/20">
             <div className="text-5xl mb-4 drop-shadow-md">🗓️</div>
             <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No events available</h3>
@@ -137,7 +130,6 @@ const ManageEvents = () => {
             <Link to="/create-event" className="glass-btn inline-block">Create New Event</Link>
           </div>
         ) : (
-          /* Event List */
           <div className="space-y-6">
             {events.map((event) => (
               <div
@@ -145,7 +137,6 @@ const ManageEvents = () => {
                 className="glass-panel p-6 shadow-2xl transition-all duration-300 hover:border-white/30"
               >
                 {editingId === event.id ? (
-                  /* Inline Edit Form */
                   <form onSubmit={saveEdit} className="space-y-6 animate-fadeIn">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
 
@@ -190,6 +181,26 @@ const ManageEvents = () => {
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL (Optional)</label>
                         <input type="url" name="image" value={editFormData.image || ''} onChange={handleEditChange} className="input-field w-full" />
+                        <p className="text-xs text-gray-500 mt-2">
+                          Use a direct image URL or a public Google Drive/Dropbox image link.
+                        </p>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <div className="glass-panel p-4 border-white/10">
+                          <p className="text-sm font-semibold text-gray-300 mb-3">Image Preview</p>
+                          <div className="overflow-hidden rounded-2xl border border-white/10 aspect-[16/9] bg-white/5">
+                            <img
+                              src={getEventImageUrl(editFormData.image)}
+                              alt={`${editFormData.title || 'Event'} preview`}
+                              className="w-full h-full object-cover"
+                              referrerPolicy="no-referrer"
+                              onError={(e) => {
+                                e.currentTarget.src = FALLBACK_EVENT_IMAGE;
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                     </div>
@@ -200,8 +211,31 @@ const ManageEvents = () => {
                     </div>
                   </form>
                 ) : (
-                  /* Event Details Display */
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 animate-fadeIn">
+                    <div className="w-full md:w-56 shrink-0">
+                      <div className="overflow-hidden rounded-2xl border border-white/10 aspect-[16/10] bg-white/5 shadow-inner">
+                        <img
+                          src={getEventImageUrl(event.image)}
+                          alt={event.title}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.src = FALLBACK_EVENT_IMAGE;
+                          }}
+                        />
+                      </div>
+                      {event.image && (
+                        <a
+                          href={event.image}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex mt-3 text-xs text-primary-300 hover:text-primary-200 transition-colors"
+                        >
+                          Open image link
+                        </a>
+                      )}
+                    </div>
+
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <h3 className="text-2xl font-bold text-white">{event.title}</h3>

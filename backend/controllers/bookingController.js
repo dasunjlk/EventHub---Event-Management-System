@@ -2,44 +2,28 @@ import Booking from '../models/Booking.js';
 import Event from '../models/Event.js';
 import { v4 as uuidv4 } from 'uuid';
 
-// @desc    Create new booking
-// @route   POST /api/bookings
-// @access  Private
 export const createBooking = async (req, res) => {
   try {
     const { event_id, ticket_quantity } = req.body;
     const user_id = req.user.userId;
 
-    // Validate required fields
     if (!event_id || !ticket_quantity) {
       return res.status(400).json({ success: false, message: 'Please provide event_id, and ticket_quantity' });
     }
 
-    // Fetch the event from the Event model
     const event = await Event.findById(event_id);
     if (!event) {
       return res.status(404).json({ success: false, message: 'Event not found' });
     }
 
-    // Check ticket availability
     if (event.available_tickets < ticket_quantity) {
       return res.status(400).json({ success: false, message: 'Not enough tickets available' });
     }
 
-    // Calculate totalPrice
     const total_price = event.ticket_price * ticket_quantity;
-
-    // Check for existing active booking from the same user for this event
+    // Reuse the active booking so users can add tickets in multiple purchases.
     const existingBooking = await Booking.findOne({ user_id, event_id, status: 'active' });
-    if (existingBooking) {
-      return res.status(400).json({ success: false, message: 'You already have an active booking for this event.' });
-    }
 
-    // Generate a unique bookingId using uuid
-    const bookingId = uuidv4();
-
-    // Use a transaction or atomic update if possible, but for simplicity and common practice 
-    // we'll use findByIdAndUpdate for atomic decrement
     const updatedEvent = await Event.findOneAndUpdate(
       { _id: event_id, available_tickets: { $gte: ticket_quantity } },
       { $inc: { available_tickets: -ticket_quantity } },
@@ -50,7 +34,21 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Could not secure tickets. Please try again.' });
     }
 
-    // Save the booking in MongoDB using the Booking model
+    if (existingBooking) {
+      existingBooking.ticket_quantity += ticket_quantity;
+      existingBooking.total_price += total_price;
+
+      const savedBooking = await existingBooking.save();
+      return res.status(200).json({
+        success: true,
+        message: 'Tickets added to your existing booking successfully',
+        booking: savedBooking
+      });
+    }
+
+    // Generate a unique bookingId using uuid.
+    const bookingId = uuidv4();
+
     const booking = new Booking({
       user_id,
       event_id,
@@ -62,7 +60,6 @@ export const createBooking = async (req, res) => {
 
     const savedBooking = await booking.save();
 
-    // Return the saved booking as JSON response
     res.status(201).json({ success: true, booking: savedBooking });
   } catch (error) {
     console.error("Error creating booking:", error);
@@ -70,14 +67,10 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// @desc    Get all bookings for the currently logged-in user
-// @route   GET /api/bookings/user
-// @access  Private
 export const getUserBookings = async (req, res) => {
   try {
     const user_id = req.user.userId;
 
-    // Query the Booking collection for bookings matching the user_id
     const bookings = await Booking.find({ user_id })
       .populate('event_id', 'title date location category image price ticket_price available_tickets');
 
@@ -88,37 +81,32 @@ export const getUserBookings = async (req, res) => {
   }
 };
 
-// @desc    Cancel a booking
-// @route   DELETE /api/bookings/:bookingId
-// @access  Private
 export const cancelBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
     const user_id = req.user.userId;
 
-    // Find the booking
     const booking = await Booking.findById(bookingId);
 
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
-    // Check if the booking belongs to the user
     if (booking.user_id.toString() !== user_id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized to cancel this booking' });
     }
 
-    // Prevent double cancellation
+    // Prevent double cancellation.
     if (booking.status === 'cancelled') {
       return res.status(400).json({ success: false, message: 'Booking is already cancelled' });
     }
 
-    // Restore ticket availability atomically
+    // Restore ticket availability atomically.
     await Event.findByIdAndUpdate(booking.event_id, {
       $inc: { available_tickets: booking.ticket_quantity }
     });
 
-    // Soft update status
+    // Soft update status.
     booking.status = 'cancelled';
     await booking.save();
 

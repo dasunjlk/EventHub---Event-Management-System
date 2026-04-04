@@ -10,9 +10,6 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -60,9 +57,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -86,9 +80,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get user profile
-// @route   GET /api/auth/profile
-// @access  Private
 export const getUserProfile = async (req, res) => {
   try {
     if (!req.user) {
@@ -107,9 +98,6 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/auth/profile
-// @access  Private
 export const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?._id;

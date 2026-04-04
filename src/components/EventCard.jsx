@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-const FALLBACK_EVENT_IMAGE = '/event-fallback.svg'
+import { FALLBACK_EVENT_IMAGE, getEventImageUrl } from '../utils/eventImages'
 
 const categoryColors = {
   Music: 'glass-badge border-purple-500/30 text-purple-200 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
@@ -25,10 +24,10 @@ const formatEventDate = (date) => {
 }
 
 const EventCard = ({ id, title, date, location, price, image, category }) => {
-  const [imageSrc, setImageSrc] = useState(image || FALLBACK_EVENT_IMAGE)
+  const [imageSrc, setImageSrc] = useState(getEventImageUrl(image))
 
   useEffect(() => {
-    setImageSrc(image || FALLBACK_EVENT_IMAGE)
+    setImageSrc(getEventImageUrl(image))
   }, [image])
 
   const formattedDate = formatEventDate(date)
@@ -53,6 +52,7 @@ const EventCard = ({ id, title, date, location, price, image, category }) => {
           alt={displayTitle}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          referrerPolicy="no-referrer"
           onError={() => {
             if (imageSrc !== FALLBACK_EVENT_IMAGE) {
               setImageSrc(FALLBACK_EVENT_IMAGE)

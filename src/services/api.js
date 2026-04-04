@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { normalizeEventImageUrl } from '../utils/eventImages';
 
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
@@ -7,11 +8,11 @@ const api = axios.create({
 const mapEvent = (event) => ({
   ...event,
   id: event._id || event.id,
+  image: normalizeEventImageUrl(event.image),
   price: event.ticket_price,
   seats: event.available_tickets
 });
 
-// Add a request interceptor to attach JWT token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,14 +24,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle 401 errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login if not already there
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
@@ -68,6 +67,7 @@ export const eventAPI = {
   createEvent: async (eventData) => {
     const res = await api.post('/events', {
       ...eventData,
+      image: normalizeEventImageUrl(eventData.image),
       ticket_price: Number(eventData.ticket_price),
       available_tickets: Number(eventData.available_tickets)
     });

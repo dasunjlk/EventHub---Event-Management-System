@@ -22,7 +22,6 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized, user not found', data: null });
     }
 
-    // Attach user payload as per assumption
     req.user = {
       userId: user._id,
       role: user.role,

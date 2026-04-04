@@ -53,7 +53,6 @@ export default function MyBookings() {
     try {
       setCancellingId(id);
       await cancelBooking(id);
-      // Remove the cancelled booking from the UI immediately
       setBookings((prevBookings) => prevBookings.filter((booking) => booking._id !== id));
     } catch (err) {
       setAlertInfo({ isOpen: true, message: err.message || 'Error occurred while cancelling booking', type: 'danger', title: 'Cancellation Failed' });
@@ -166,7 +165,6 @@ export default function MyBookings() {
               {bookings.map((booking) => {
                 const eventData = booking.event_id || {};
 
-                // Determine status class based on booking status, default to Confirmed format
                 const statusLabel = booking.status
                   ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
                   : 'Confirmed';
@@ -174,7 +172,6 @@ export default function MyBookings() {
 
                 return (
                   <div key={booking._id} className="glass-panel p-6 sm:p-8 flex flex-col md:flex-row gap-6 md:items-center relative shadow-2xl border-white/20">
-                    {/* Event Details */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
                         <Link to={`/events/${eventData._id || eventData.id}`} className="text-2xl font-bold text-white drop-shadow-sm hover:text-primary-400 transition-colors">
@@ -205,7 +202,6 @@ export default function MyBookings() {
                         )}
                       </div>
 
-                      {/* Booking Meta Information */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
                         <div>
                           <p className="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wider">Tickets</p>
