@@ -1,9 +1,14 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import Event from './models/Event.js';
 import User from './models/User.js';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const events = [
   {
@@ -98,13 +103,20 @@ const seedDB = async () => {
     await User.deleteMany({});
     console.log('Cleared existing events and users');
 
-    await Event.insertMany(events);
-    await User.create({
+    const testUser = await User.create({
       name: 'Test Administrator',
       email: 'test@example.com',
       password: 'password123',
       role: 'admin'
     });
+
+    // Inject the test user ID into all dummy events to satisfy the 'createdBy' schema requirement
+    const eventsWithCreator = events.map(e => ({
+      ...e,
+      createdBy: testUser._id
+    }));
+
+    await Event.insertMany(eventsWithCreator);
     console.log('Database seeded with 8 dummy events and 1 test user!');
     
     process.exit(0);

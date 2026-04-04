@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import eventService from '../services/eventService';
+import ConfirmModal from '../components/ConfirmModal';
+import AlertModal from '../components/AlertModal';
 
 const ManageEvents = () => {
   const [events, setEvents] = useState([]);
@@ -8,6 +11,10 @@ const ManageEvents = () => {
 
   const [editingId, setEditingId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+
+  const [deleteId, setDeleteId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({ isOpen: false, message: '', type: 'danger', title: 'Error' });
 
   const categories = ['Music', 'Tech', 'Art', 'Education', 'Workshop'];
 
@@ -18,10 +25,9 @@ const ManageEvents = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/events');
-      if (!res.ok) throw new Error('Failed to fetch events');
-      const data = await res.json();
-      
+      const res = await eventService.getMyEvents();
+      const data = res.data || res;
+
       const formattedData = data.map(ev => ({
         ...ev,
         id: ev._id || ev.id
@@ -29,23 +35,25 @@ const ManageEvents = () => {
       setEvents(formattedData);
       setError(null);
     } catch (err) {
-      setError('Could not load events. Please ensure the backend is running.');
+      setError(err.message || 'Could not load events. Please ensure the backend is running.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      try {
-        const res = await fetch(`http://localhost:5000/api/events/${id}`, {
-          method: 'DELETE'
-        });
-        if (!res.ok) throw new Error('Failed to delete event');
-        setEvents(events.filter(event => event.id !== id));
-      } catch (err) {
-        alert(err.message);
-      }
+  const requestDelete = (id) => {
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await eventService.deleteEvent(deleteId);
+      setEvents(events.filter(event => event.id !== deleteId));
+      setDeleteId(null);
+    } catch (err) {
+      setAlertInfo({ isOpen: true, message: err.message, type: 'danger', title: 'Error' });
     }
   };
 
@@ -56,8 +64,8 @@ const ManageEvents = () => {
     if (formattedDate.includes('Z')) {
       formattedDate = new Date(formattedDate).toISOString().slice(0, 16);
     }
-    
-    setEditFormData({ 
+
+    setEditFormData({
       ...event,
       date: formattedDate
     });
@@ -81,18 +89,9 @@ const ManageEvents = () => {
         available_tickets: Number(editFormData.available_tickets)
       };
 
-      const res = await fetch(`http://localhost:5000/api/events/${editingId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-      
-      if (!res.ok) throw new Error('Failed to update event');
-      const responseData = await res.json();
-      const updatedEvent = responseData.event || responseData;
-      
+      const res = await eventService.updateEvent(editingId, payload);
+      const updatedEvent = res.data || res.event || res;
+
       const formattedUpdatedEvent = {
         ...updatedEvent,
         id: updatedEvent._id || updatedEvent.id
@@ -101,7 +100,7 @@ const ManageEvents = () => {
       setEvents(events.map(event => event.id === editingId ? formattedUpdatedEvent : event));
       setEditingId(null);
     } catch (err) {
-      alert(err.message);
+      setAlertInfo({ isOpen: true, message: err.message, type: 'danger', title: 'Error' });
     }
   };
 
@@ -116,78 +115,78 @@ const ManageEvents = () => {
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 flex justify-center items-start">
       <div className="w-full max-w-4xl space-y-8">
-        
+
         {/* Header Section */}
-        <div className="text-center bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-3xl sm:text-4xl font-black text-white">Manage Events</h2>
-          <p className="mt-3 text-lg text-gray-400">View, update, or remove events that you have created.</p>
+        <div className="text-center glass-panel shadow-2xl border-white/20 p-8">
+          <h2 className="text-3xl sm:text-4xl font-black text-white drop-shadow-md">Manage Events</h2>
+          <p className="mt-3 text-lg text-gray-200">View, update, or remove events that you have created.</p>
         </div>
 
         {error && (
-          <div className="p-4 text-sm text-red-200 bg-red-900/50 border border-red-800 rounded-xl text-center" role="alert">
+          <div className="glass-panel p-4 text-sm text-red-200 bg-red-500/10 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)] text-center" role="alert">
             {error}
           </div>
         )}
 
         {!error && events.length === 0 ? (
           /* Empty State */
-          <div className="text-center p-12 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl">
-            <div className="text-5xl mb-4">🗓️</div>
-            <h3 className="text-xl font-bold text-white mb-2">No events available</h3>
-            <p className="text-gray-400 mb-6">You haven't created any events yet.</p>
-            <Link to="/create-event" className="btn-primary inline-block">Create New Event</Link>
+          <div className="text-center p-12 glass-panel shadow-2xl border-white/20">
+            <div className="text-5xl mb-4 drop-shadow-md">🗓️</div>
+            <h3 className="text-xl font-bold text-white mb-2 drop-shadow-sm">No events available</h3>
+            <p className="text-gray-300 mb-6 border-white/20">You haven't created any events yet.</p>
+            <Link to="/create-event" className="glass-btn inline-block">Create New Event</Link>
           </div>
         ) : (
           /* Event List */
           <div className="space-y-6">
             {events.map((event) => (
-              <div 
-                key={event.id} 
-                className="bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-gray-600"
+              <div
+                key={event.id}
+                className="glass-panel p-6 shadow-2xl transition-all duration-300 hover:border-white/30"
               >
                 {editingId === event.id ? (
                   /* Inline Edit Form */
                   <form onSubmit={saveEdit} className="space-y-6 animate-fadeIn">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Event Title *</label>
                         <input type="text" name="title" value={editFormData.title || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Description *</label>
                         <textarea name="description" value={editFormData.description || ''} onChange={handleEditChange} required rows="3" className="input-field w-full resize-none"></textarea>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Date *</label>
                         <input type="datetime-local" name="date" value={editFormData.date || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Location *</label>
                         <input type="text" name="location" value={editFormData.location || ''} onChange={handleEditChange} required className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Category *</label>
-                        <select name="category" value={editFormData.category || ''} onChange={handleEditChange} required className="input-field w-full bg-gray-800 text-white">
+                        <select name="category" value={editFormData.category || ''} onChange={handleEditChange} required className="input-field w-full text-white [&>option]:bg-black">
                           <option value="" disabled>Select a category</option>
                           {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Ticket Price (LKR) *</label>
                         <input type="number" name="ticket_price" value={editFormData.ticket_price ?? ''} onChange={handleEditChange} required min="0" step="0.01" className="input-field w-full" />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Available Tickets *</label>
                         <input type="number" name="available_tickets" value={editFormData.available_tickets ?? ''} onChange={handleEditChange} required min="0" className="input-field w-full" />
                       </div>
-                      
+
                       <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-300 mb-2">Image URL (Optional)</label>
                         <input type="url" name="image" value={editFormData.image || ''} onChange={handleEditChange} className="input-field w-full" />
@@ -195,9 +194,9 @@ const ManageEvents = () => {
 
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-800">
-                      <button type="submit" className="flex-1 btn-primary py-2.5 text-sm">Save Changes</button>
-                      <button type="button" onClick={cancelEdit} className="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm text-gray-300 bg-gray-800 hover:bg-gray-700 transition duration-300 border border-gray-700">Cancel</button>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/20">
+                      <button type="submit" className="flex-1 glass-btn py-2.5 text-sm">Save Changes</button>
+                      <button type="button" onClick={cancelEdit} className="flex-1 glass-btn text-gray-200 border-white/20 hover:border-white/40">Cancel</button>
                     </div>
                   </form>
                 ) : (
@@ -206,17 +205,17 @@ const ManageEvents = () => {
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-2">
                         <h3 className="text-2xl font-bold text-white">{event.title}</h3>
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary-900/40 text-primary-300 border border-primary-700/40">
+                        <span className="glass-badge">
                           {event.category}
                         </span>
                       </div>
-                      
+
                       <p className="text-gray-400 text-sm mb-5 line-clamp-2">{event.description}</p>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 text-sm text-gray-300">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500">📅</span>
-                          <span>{new Date(event.date).toLocaleDateString()} at {new Date(event.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                          <span>{new Date(event.date).toLocaleDateString()} at {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-gray-500">📍</span>
@@ -232,17 +231,17 @@ const ManageEvents = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex sm:flex-col gap-3 md:min-w-[120px] mt-4 md:mt-0">
-                      <button 
+                      <button
                         onClick={() => startEdit(event)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-blue-300 bg-blue-900/30 hover:bg-blue-900/50 border border-blue-800/50 transition duration-300 text-center"
+                        className="flex-1 glass-btn text-white border-white/20 hover:border-white/40 shadow-sm"
                       >
                         Edit
                       </button>
-                      <button 
-                        onClick={() => handleDelete(event.id)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-red-300 bg-red-900/30 hover:bg-red-900/50 border border-red-800/50 transition duration-300 text-center"
+                      <button
+                        onClick={() => requestDelete(event.id)}
+                        className="flex-1 glass-btn text-white border-red-500/50 hover:bg-red-500/20 shadow-sm"
                       >
                         Delete
                       </button>
@@ -254,6 +253,21 @@ const ManageEvents = () => {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Event"
+        message="Are you sure you want to delete this event?"
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+      />
+      <AlertModal
+        isOpen={alertInfo.isOpen}
+        onClose={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+        {...alertInfo}
+      />
     </div>
   );
 };

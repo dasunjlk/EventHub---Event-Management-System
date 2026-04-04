@@ -3,20 +3,46 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [user, setUser] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData))
+      } catch (err) {
+        console.error('Error parsing user data', err)
+      }
+    } else {
+      setUser(null)
+    }
+  }, [location])
+
+  // Close menus on route change
+  useEffect(() => {
+    setMenuOpen(false)
+    setProfileOpen(false)
+  }, [location])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     navigate('/login')
   }
-
-  // Close mobile menu on route change
+  // Close profile dropdown when clicking outside
   useEffect(() => {
-    setMenuOpen(false)
-  }, [location])
+    const handleClickOutside = (e) => {
+      if (profileOpen && !e.target.closest('#profile-dropdown-container')) {
+        setProfileOpen(false)
+      }
+    }
+    window.addEventListener('click', handleClickOutside)
+    return () => window.removeEventListener('click', handleClickOutside)
+  }, [profileOpen])
 
   // Add background on scroll
   useEffect(() => {
@@ -26,15 +52,15 @@ const Navbar = () => {
   }, [])
 
   const navLinkClass = ({ isActive }) =>
-    `text-sm font-semibold transition-colors duration-200 ${isActive
-      ? 'text-primary-400'
-      : 'text-gray-300 hover:text-white'
+    `text-sm font-semibold transition-all duration-300 px-3 py-1.5 rounded-lg ${isActive
+      ? 'text-white bg-white/20 shadow-inner border border-white/10'
+      : 'text-gray-200 hover:text-white hover:bg-white/10'
     }`
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || menuOpen
-          ? 'bg-gray-950/95 backdrop-blur-md border-b border-gray-800 shadow-lg'
+          ? 'bg-white/10 backdrop-blur-2xl border-b border-white/10 shadow-lg shadow-black/20'
           : 'bg-transparent'
         }`}
     >
@@ -58,20 +84,63 @@ const Navbar = () => {
             <NavLink to="/events" className={navLinkClass}>Events</NavLink>
             {localStorage.getItem('token') ? (
               <>
-                <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                {(user?.role === 'admin' || user?.role === 'organizer') && (
+                  <NavLink to="/create-event" className={navLinkClass}>Create Event</NavLink>
+                )}
                 <NavLink to="/dashboard" className={navLinkClass}>Dashboard</NavLink>
-                <button
-                  onClick={handleLogout}
-                  className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 px-5"
-                >
-                  Logout
-                </button>
+                {/* Profile Dropdown */}
+                <div className="relative" id="profile-dropdown-container">
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center justify-center w-10 h-10 glass-panel !p-0 !rounded-full hover:bg-white/20 transition-all duration-300"
+                    title="Profile Menu"
+                  >
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </button>
+
+                  {profileOpen && (
+                    <div className="absolute right-0 mt-3 w-48 glass-panel !p-2 flex flex-col gap-1 shadow-2xl animate-fadeIn z-50">
+                      <Link
+                        to="/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/my-bookings"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        My Bookings
+                      </Link>
+                      <hr className="border-white/10 my-1" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 rounded-xl transition-all text-left"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <Link
                 to="/login"
                 id="nav-login-btn"
-                className="btn-primary text-sm py-2 px-5"
+                className="glass-btn text-sm py-2 px-6 shadow-lg shadow-white/5"
               >
                 Login
               </Link>
@@ -82,19 +151,19 @@ const Navbar = () => {
           <button
             id="mobile-menu-toggle"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+            className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-white/10 transition-colors duration-200"
             aria-label="Toggle menu"
           >
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''
                 }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${menuOpen ? 'opacity-0' : ''
                 }`}
             />
             <span
-              className={`block w-5 h-0.5 bg-gray-300 transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''
                 }`}
             />
           </button>
@@ -103,19 +172,33 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+        className={`md:hidden transition-all duration-300 overflow-hidden ${menuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
           }`}
       >
-        <div className="px-4 pb-4 flex flex-col gap-3 bg-gray-950/95 backdrop-blur-md border-t border-gray-800">
+        <div className="px-4 pb-4 flex flex-col gap-3 bg-black/40 backdrop-blur-3xl border-t border-white/10 rounded-b-3xl shadow-2xl">
           <NavLink to="/" className={navLinkClass} id="mobile-nav-home">Home</NavLink>
           <NavLink to="/events" className={navLinkClass} id="mobile-nav-events">Events</NavLink>
           {localStorage.getItem('token') ? (
             <>
-              <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              {(user?.role === 'admin' || user?.role === 'organizer') && (
+                <NavLink to="/create-event" className={navLinkClass} id="mobile-nav-create-event">Create Event</NavLink>
+              )}
               <NavLink to="/dashboard" className={navLinkClass} id="mobile-nav-dashboard">Dashboard</NavLink>
+              <NavLink to="/profile" className={(props) => `${navLinkClass(props)} flex items-center gap-3`} id="mobile-nav-profile">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                My Profile
+              </NavLink>
+              <NavLink to="/my-bookings" className={(props) => `${navLinkClass(props)} flex items-center gap-3`} id="mobile-nav-bookings">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                My Bookings
+              </NavLink>
               <button
                 onClick={handleLogout}
-                className="btn-primary bg-red-600 hover:bg-red-700 text-sm py-2 text-center mt-1"
+                className="glass-btn border-red-500/40 text-red-200 bg-red-500/20 hover:bg-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.15)] text-sm py-3 text-center mt-2 rounded-2xl"
               >
                 Logout
               </button>
@@ -124,7 +207,7 @@ const Navbar = () => {
             <Link
               to="/login"
               id="mobile-nav-login"
-              className="btn-primary text-sm py-2 text-center mt-1"
+              className="glass-btn text-sm py-3 text-center mt-2 w-full rounded-2xl"
             >
               Login
             </Link>

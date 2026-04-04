@@ -1,65 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EventCard from '../components/EventCard'
 import SearchBar from '../components/SearchBar'
 import CategoryFilter from '../components/CategoryFilter'
-
-const categories = [
-  {
-    name: 'Music',
-    icon: '🎵',
-    color: 'from-pink-600/20 to-pink-900/20 border-pink-800/50 hover:border-pink-600',
-    textColor: 'text-pink-300',
-  },
-  {
-    name: 'Tech',
-    icon: '💻',
-    color: 'from-blue-600/20 to-blue-900/20 border-blue-800/50 hover:border-blue-600',
-    textColor: 'text-blue-300',
-  },
-  {
-    name: 'Art',
-    icon: '🎨',
-    color: 'from-purple-600/20 to-purple-900/20 border-purple-800/50 hover:border-purple-600',
-    textColor: 'text-purple-300',
-  },
-  {
-    name: 'Education',
-    icon: '📚',
-    color: 'from-green-600/20 to-green-900/20 border-green-800/50 hover:border-green-600',
-    textColor: 'text-green-300',
-  },
-  {
-    name: 'Workshop',
-    icon: '🔧',
-    color: 'from-amber-600/20 to-amber-900/20 border-amber-800/50 hover:border-amber-600',
-    textColor: 'text-amber-300',
-  },
-]
+import { eventAPI } from '../services/api'
 
 const Home = () => {
   const navigate = useNavigate()
   const [authError, setAuthError] = useState('')
   const [featuredEvents, setFeaturedEvents] = useState([])
+  const [featuredLoading, setFeaturedLoading] = useState(true)
+  const [featuredError, setFeaturedError] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const fetchFeaturedEvents = async () => {
+    setFeaturedLoading(true)
+    setFeaturedError('')
+
+    try {
+      const events = await eventAPI.getAllEvents()
+      setFeaturedEvents((events || []).slice(0, 6))
+    } catch (err) {
+      console.error('Could not load featured events:', err)
+      setFeaturedEvents([])
+      setFeaturedError('Featured events are unavailable right now. Please try again.')
+    } finally {
+      setFeaturedLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/events');
-        if (!res.ok) throw new Error('Failed to fetch events');
-        const data = await res.json();
-        
-        const formattedData = data.map(ev => ({
-          ...ev,
-          id: ev._id || ev.id,
-          price: ev.ticket_price
-        }));
-        setFeaturedEvents(formattedData.slice(0, 6));
-      } catch (err) {
-        console.error('Could not load featured events:', err);
-      }
-    };
-    fetchEvents();
+    fetchFeaturedEvents()
   }, [])
 
   const handleCreateEventClick = (e) => {
@@ -69,53 +40,73 @@ const Home = () => {
       setTimeout(() => setAuthError(''), 3000)
     }
   }
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    const trimmed = searchQuery.trim()
+    const params = new URLSearchParams()
+
+    if (trimmed) {
+      params.set('search', trimmed)
+    }
+
+    const queryString = params.toString()
+    navigate(queryString ? `/events?${queryString}` : '/events')
+  }
+
+  const handleCategorySelect = (category) => {
+    const params = new URLSearchParams()
+    if (category && category !== 'All') {
+      params.set('category', category)
+    }
+
+    const queryString = params.toString()
+    navigate(queryString ? `/events?${queryString}` : '/events')
+  }
+
   return (
     <>
-      {/* ── Hero Section ── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-primary-950/50 to-gray-950" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-800/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent-600/10 via-transparent to-transparent" />
-
-        {/* Decorative blobs */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-600/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-pulse" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 animate-slide-up">
-          {/* Badge */}
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-900/60 border border-primary-700/50 text-primary-300 text-sm font-medium mb-8">
-            <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
+          <span className="glass-badge mb-8 px-4 py-1.5 text-sm gap-2">
+            <span className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
             10,000+ events listed across Sri Lanka
           </span>
 
-          {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-2xl">
             Discover{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 animate-gradient-x">
               Amazing Events
             </span>
             <br />
-            Near You
+            <span className="text-gray-200">Near You</span>
           </h1>
 
-          {/* Subtext */}
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             Find and book tickets for the best events. Music festivals, tech conferences, art exhibitions and more. All in one place.
           </p>
 
-          {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full">
-            <SearchBar placeholder="Search events, artists, venues..." />
-            <Link to="/events" id="hero-browse-btn" className="btn-primary whitespace-nowrap">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-10 w-full"
+          >
+            <SearchBar
+              placeholder="Search events, artists, venues..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" id="hero-browse-btn" className="glass-btn whitespace-nowrap">
               Browse Events
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
-          </div>
+            </button>
+          </form>
 
-          {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 text-center">
             {[
               { value: '10K+', label: 'Events' },
@@ -129,13 +120,9 @@ const Home = () => {
             ))}
           </div>
         </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent" />
       </section>
 
-      {/* ── Categories Section ── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative -mt-px max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-12">
           <h2 className="section-heading">Browse by Category</h2>
           <p className="section-subheading">Find events that match your interests</p>
@@ -144,12 +131,11 @@ const Home = () => {
         <div className="flex justify-center mt-8">
           <CategoryFilter
             categories={['Music', 'Tech', 'Art', 'Education', 'Workshop']}
-            onSelectCategory={(cat) => navigate(`/events?category=${cat}`)}
+            onSelectCategory={handleCategorySelect}
           />
         </div>
       </section>
 
-      {/* ── Featured Events Section ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
         <div className="flex items-center justify-between mb-10">
           <div>
@@ -159,7 +145,7 @@ const Home = () => {
           <Link
             to="/events"
             id="see-all-events-btn"
-            className="btn-outline hidden sm:inline-flex text-sm py-2 px-5"
+            className="glass-btn hidden sm:inline-flex text-sm py-2 px-6"
           >
             See All
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,39 +154,68 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredEvents.map((event) => (
-            <EventCard key={event.id} {...event} />
-          ))}
-        </div>
+        {featuredLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={`featured-skeleton-${index}`} className="glass-panel !p-0 overflow-hidden animate-pulse">
+                <div className="aspect-[16/9] bg-white/10" />
+                <div className="p-5 space-y-3">
+                  <div className="h-5 w-3/4 bg-white/10 rounded" />
+                  <div className="h-4 w-1/2 bg-white/10 rounded" />
+                  <div className="h-4 w-2/3 bg-white/10 rounded" />
+                  <div className="h-10 w-full bg-white/10 rounded-xl mt-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : featuredError ? (
+          <div className="glass-panel p-8 text-center max-w-2xl mx-auto">
+            <p className="text-red-300 text-lg mb-5">{featuredError}</p>
+            <button onClick={fetchFeaturedEvents} className="glass-btn px-8">
+              Retry
+            </button>
+          </div>
+        ) : featuredEvents.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredEvents.map((event) => (
+              <EventCard key={event.id} {...event} />
+            ))}
+          </div>
+        ) : (
+          <div className="glass-panel p-8 text-center max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold text-white mb-3">No featured events right now</h3>
+            <p className="text-gray-300 mb-6">Browse all events to discover what is happening next.</p>
+            <Link to="/events" className="glass-btn px-8">
+              Browse All Events
+            </Link>
+          </div>
+        )}
 
-        {/* Mobile see all */}
         <div className="mt-10 text-center sm:hidden">
-          <Link to="/events" className="btn-outline">
+          <Link to="/events" className="glass-btn">
             See All Events
           </Link>
         </div>
       </section>
 
-      {/* ── Host Event CTA ── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-10">
-        <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-3xl p-10 sm:p-14 shadow-2xl relative overflow-hidden group text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/10 via-transparent to-accent-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="glass-panel p-10 sm:p-14 relative overflow-hidden group text-center">
+          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">Want to host an event?</h2>
             <p className="text-gray-400 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
               Create and manage your own events easily and reach a wider audience.
             </p>
             <div className="relative inline-flex flex-col items-center">
-              <Link 
-                to="/create-event" 
+              <Link
+                to="/create-event"
                 onClick={handleCreateEventClick}
-                className="btn-primary py-3.5 px-8 text-lg font-bold shadow-lg hover:shadow-primary-500/25 hover:-translate-y-1 transition-all duration-300"
+                className="glass-btn py-3.5 px-8 text-lg font-bold w-auto border-white/30"
               >
                 Create Event
               </Link>
               {authError && (
-                <div className="absolute top-full mt-3 px-4 py-2 bg-red-900/90 border border-red-800 text-red-200 text-sm font-semibold rounded-lg shadow-xl whitespace-nowrap animate-fadeIn z-20">
+                <div className="absolute top-full mt-3 px-4 py-2 glass-panel bg-red-500/10 border-red-500/30 text-red-200 text-sm font-semibold shadow-[0_0_15px_rgba(239,68,68,0.1)] whitespace-nowrap animate-fadeIn z-20">
                   {authError}
                 </div>
               )}
@@ -209,18 +224,17 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
-      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-3xl overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-500" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-accent-500/30 via-transparent to-transparent" />
+      <section className="mx-4 sm:mx-6 lg:mx-8 max-w-7xl lg:mx-auto mb-20 rounded-[2rem] overflow-hidden relative glass-panel !p-0 border-white/20">
+        <div className="absolute inset-0 bg-white/5" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent" />
         <div className="relative px-8 py-14 text-center">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 drop-shadow-md">
             Ready to experience something amazing?
           </h2>
-          <p className="text-primary-100 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-gray-200 text-lg mb-8 max-w-xl mx-auto drop-shadow-sm font-medium">
             Join thousands of people discovering great events every day.
           </p>
-          <Link to="/events" id="cta-browse-btn" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-700 font-bold rounded-xl hover:bg-primary-50 transition-all duration-200 hover:-translate-y-0.5 shadow-xl">
+          <Link to="/events" id="cta-browse-btn" className="glass-btn px-8 py-3.5 text-lg font-bold w-auto border-white/40">
             Explore All Events
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />

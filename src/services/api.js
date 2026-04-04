@@ -4,6 +4,13 @@ const api = axios.create({
   baseURL: 'http://localhost:5000/api',
 });
 
+const mapEvent = (event) => ({
+  ...event,
+  id: event._id || event.id,
+  price: event.ticket_price,
+  seats: event.available_tickets
+});
+
 // Add a request interceptor to attach JWT token
 api.interceptors.request.use(
   (config) => {
@@ -16,6 +23,22 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add a response interceptor to handle 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to login if not already there
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
   login: async (credentials) => {
     return api.post('/auth/login', credentials);
@@ -25,18 +48,22 @@ export const authAPI = {
   },
   getProfile: async () => {
     return api.get('/auth/profile');
+  },
+  updateProfile: async (profileData) => {
+    return api.put('/auth/profile', profileData);
   }
 };
 
 export const eventAPI = {
   getAllEvents: async () => {
     const res = await api.get('/events');
-    // Map backend `_id` to `id` for frontend consistency if needed
-    return res.data.map(event => ({
-      ...event,
-      id: event._id,
-      price: event.ticket_price
-    }));
+    const eventsArray = res.data.data || res.data;
+    return eventsArray.map(mapEvent);
+  },
+  getEventById: async (id) => {
+    const res = await api.get(`/events/${id}`);
+    const eventObj = res.data.data || res.data;
+    return mapEvent(eventObj);
   },
   createEvent: async (eventData) => {
     const res = await api.post('/events', {
